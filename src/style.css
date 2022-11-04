@@ -1,0 +1,29 @@
+@import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/light.css';
+
+body, h1, h2, h3, h4, h5, h6 {
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin: 0px;
+  padding: 0px;
+}
+.app {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 50px 1fr;
+  height: 100vh;
+  height: 100svh; /* doesn't work on all browsers, hence fallback above */
+  width: 100vw;
+}
+.navbar {
+  background-color: bisque;
+}
+
+#main-content {
+  overflow-x: hidden;
+  position: relative;
+  overflow-y: scroll;
+}
+

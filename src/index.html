@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/shoelace.js"></script>
+  
+  <template id='G-THUMB'>
+    <!-- checkbox css heavily borrowed from https://stackoverflow.com/a/30663705/8098748   -->
+    <style>
+      #container {
+        position: relative;
+        background-color: whitesmoke;
+        /* height: 250px; */
+        /* width: 400px; */
+        /* display: block; */
+        transition: all 0.3s ease-in-out;
+      }
+      
+      .removed {
+        transform: scale(0);
+      }
+  
+      img {
+        /* position: absolute; */
+        /* top: 0px; */
+        /* left: 0px; */
+        background-color: darkgrey;
+        max-width: 100%;
+        max-height: 100%;
+        box-sizing: border-box;
+        /*   border: solid 0px; */
+        transition: all 0.4s ease-in-out;
+        /*   transform-origin: 50% 50%; */
+        /*   display: block; */
+        cursor: pointer;
+        visibility: hidden;
+      }
+      
+      img.ready {
+        visibility: visible;
+        animation: 0.4s lodingfeel cubic-bezier(1,0,1,.08);
+      }
+      @keyframes lodingfeel {
+        from {
+          filter: blur(15px);
+        }
+        to {
+          filter: blur(0);
+          opacity: 1;
+        }
+      }
+      
+      sl-rating {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        --symbol-size: 1rem;
+        --symbol-spacing: 1px;
+      }
+  
+      sl-icon-button[name="trash"] {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        font-size: 1.5rem;
+      }
+  
+      sl-icon-button[name="trash"]::part(base) {
+        color: #dfdeda;
+      }
+  
+      input[type="checkbox"] {
+        display: none;
+      }
+  
+      label:before {
+        background-color: none;
+        color: white;
+        content: " ";
+        display: block;
+        border-radius: 50%;
+        border: 3px solid grey;
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 28px;
+        transition-duration: 0.4s;
+        z-index: 1;
+        pointer-events: auto;
+        cursor: pointer;
+        /*   transform: scale(0); */
+      }
+  
+      /* :checked ~ img {
+        border-color: #ddd;
+      } */
+      :checked + label:before {
+        content: "✓";
+        background-color: #66b3ff;
+        transform: scale(1.5);
+      }
+  
+      :checked ~ img {
+        transform: scale(0.85);
+        box-shadow: 0 0 5px #333;
+        z-index: -1;
+      }
+    </style>
+  
+    <div id="container">
+      <!--  rest of the template is updated in the connectedCallback method -->
+    </div>
+    
+  </template>
+
+  <template id='G-ALBUM'>
+    <style>
+      #container {
+        position: relative;
+      }
+
+      #album-name {
+        position: sticky;
+        top: 0px;
+        margin: 0 0 0 4px;
+        /* padding-left: 5px; */
+        font-size: 1.25rem;
+        font-weight: bolder;
+        /* height: 60px; this is set in javascript */
+        width: 100%;
+        overflow-y: scroll;
+        align-content: center;
+        background-color: white;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+      }
+      
+      g-thumb {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+
+    </style>
+    <div id="container">
+      <div id="album-name"></div>
+    </div>
+  </template>
+
+  <template id="R3-GALLERY">
+    <style>
+      #gallery {
+        position: relative;
+        /* overflow-y: scroll; */
+      }
+
+      g-album {
+        width: 100%;
+        position: absolute;
+      }
+    </style>
+    <div id="gallery">
+
+    </div>
+  </template>
+
+</head>
+
+
+<body>
+  <div class="app">
+    <div class="navbar">
+      <p>Here's the navbar</p>
+    </div>
+    <div id="main-content">
+    </div>
+  </div>
+
+<!-- <div class="gallery" style="margin: 0px;">
+  <g-thumb class="thumb" photoid=220 rating="0" width="320" height="200" style="transform:translate(0px,0px)"></g-thumb>
+  <g-thumb class="thumb" photoid=320 rating="4" width="320" height="200" style="transform:translate(330px,0px)" selected></g-thumb>
+  <g-thumb class="thumb" photoid=422 rating="3" width="144" height="200" style="transform:translate(660px,0px)"></g-thumb>
+  <g-thumb class="thumb" photoid=820 rating="4" width="320" height="200" style="transform:translate(0px,210px)"></g-thumb>
+  <g-thumb class="thumb" photoid=902 rating="3" width="144" height="200" style="transform:translate(330px,210px)"></g-thumb>
+</div>
+ -->
+
+<!-- <g-album name='Album 1' width=500 gutterspace=4 data='[{"photoid": 1, "ar":1, "rating": 1}, {"photoid":2, "ar": 1.33, "rating": 1}, {"photoid":5, "ar":0.82, "rating": 1}]'></g-album> -->
+
+<script src="script.js"></script>
+<script type="module">  
+  
+  // function foo(){
+  //   console.log('something deleted')
+  // }
+  // document.querySelector('.gallery').addEventListener('deleted', foo, true);
+
+  (async ()=>{
+
+   async function makePicsumAlbum(d){
+    let r = await fetch(`https://picsum.photos/v2/list?page=${d.page}&limit=${d.limit}`)
+      .then(r=>r.json())
+    ;
+    
+    return r.map( x=>{
+      return {
+        photoid: x.id, 
+        ar: x.width/x.height, 
+        rating: x.id%5
+      }
+    });
+  }
+
+  let picsumGallery = [{page: 1, limit: 10}, {page: 2, limit:12}, {page:3, limit:15}, {page:4, limit:4}]
+
+  let dataPromises = picsumGallery.map(async function(gItem){
+    let albumData = await makePicsumAlbum(gItem);
+    return {
+      id: gItem.page,
+      album: `Album for page ${gItem.page} contains ${albumData.length} items`,
+      items: albumData
+    }
+  });
+
+  let data = await Promise.all(dataPromises);
+
+  console.log(data);
+
+  let gallery = Object.assign(document.createElement('r3-gallery'), { data });
+  let c = document.getElementById('main-content');
+  c.appendChild(gallery);
+})();
+
+</script>
+
+</body>
+</html>
