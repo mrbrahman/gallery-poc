@@ -160,7 +160,8 @@
     <style>
       #gallery {
         position: relative;
-        /* overflow-y: scroll; */
+        overflow-y: scroll;
+        height: 100%;
       }
 
       g-album {
@@ -206,38 +207,39 @@
 
   (async ()=>{
 
-   async function makePicsumAlbum(d){
-    let r = await fetch(`https://picsum.photos/v2/list?page=${d.page}&limit=${d.limit}`)
-      .then(r=>r.json())
-    ;
-    
-    return r.map( x=>{
+    async function makePicsumAlbum(d){
+      let r = await fetch(`https://picsum.photos/v2/list?page=${d.page}&limit=${d.limit}`)
+        .then(r=>r.json())
+      ;
+      
+      return r.map( x=>{
+        return {
+          photoid: x.id, 
+          ar: x.width/x.height, 
+          rating: x.id%5
+        }
+      });
+    }
+
+    let picsumGallery = [{page: 1, limit: 10}, {page: 2, limit:12}, {page:3, limit:15}, {page:4, limit:4}]
+
+    let dataPromises = picsumGallery.map(async function(gItem){
+      let albumData = await makePicsumAlbum(gItem);
       return {
-        photoid: x.id, 
-        ar: x.width/x.height, 
-        rating: x.id%5
+        id: gItem.page,
+        album: `Album for page ${gItem.page} contains ${albumData.length} items`,
+        items: albumData
       }
     });
-  }
 
-  let picsumGallery = [{page: 1, limit: 10}, {page: 2, limit:12}, {page:3, limit:15}, {page:4, limit:4}]
+    let data = await Promise.all(dataPromises);
 
-  let dataPromises = picsumGallery.map(async function(gItem){
-    let albumData = await makePicsumAlbum(gItem);
-    return {
-      id: gItem.page,
-      album: `Album for page ${gItem.page} contains ${albumData.length} items`,
-      items: albumData
-    }
-  });
+    console.log(data);
 
-  let data = await Promise.all(dataPromises);
-
-  console.log(data);
-
-  let gallery = Object.assign(document.createElement('r3-gallery'), { data });
-  let c = document.getElementById('main-content');
-  c.appendChild(gallery);
+    let gallery = Object.assign(document.createElement('r3-gallery'), { data });
+    let c = document.getElementById('main-content');
+    c.appendChild(gallery);
+  
 })();
 
 </script>

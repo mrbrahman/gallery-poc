@@ -23,7 +23,7 @@ body {
 
 #main-content {
   overflow-x: hidden;
+  overflow-y: hidden;
   position: relative;
-  overflow-y: scroll;
 }
 

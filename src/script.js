@@ -420,7 +420,9 @@ customElements.define('g-album', GAlbum);
 
 class R3Gallery extends HTMLElement {
 
+  // internal variables
   _cum_height = 0; _albums;
+  // variables that can be get/set
   _data;
 
   constructor() {
@@ -452,9 +454,9 @@ class R3Gallery extends HTMLElement {
   
       return album;
     });
-    // this.shadowRoot.getElementById('gallery').style.height = this._cum_height+'px';
+    
     this.shadowRoot.getElementById('gallery').addEventListener('scroll', function(event){
-      console.log('scroll fired')
+      console.log('scroll fired');
     })
   
   }
