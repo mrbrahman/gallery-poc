@@ -118,23 +118,31 @@ class GThumb extends HTMLElement {
       console.log('dispatching delete event');
       parent.dispatchEvent(deleteEvent);
       parent.shadowRoot.querySelector('#container').classList.add('removed');
-      // TODO: add listener to wait for CSS animation completion, rather than hardcode 400ms
-      setTimeout(()=>parent.remove(), 400);
+      // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
+      setTimeout(()=>{parent.remove()}, 300);
     })
     
   }
   
   // individual paint functions
-  // checking for this.inDOM in each, as these get triggered for static elements
+  // checking for this.inDOM in each, as these also get triggered for static elements
   // that use attributeChangedCallback to set the values before connectedComponents is called
   paintWidth(){
     if(this.inDOM){
       this.shadowRoot.getElementById('container').style.width = this._width+'px';
+      // img element is not present during initial paint
+      if (this.shadowRoot.querySelector('img')){
+        this.shadowRoot.querySelector('img').style.width = this._width+'px';
+      }
     }
   }
   paintHeight(){
     if(this.inDOM){
       this.shadowRoot.getElementById('container').style.height = this._height+'px';
+      // img element is not present during initial paint
+      if(this.shadowRoot.querySelector('img')){
+        this.shadowRoot.querySelector('img').style.height = this._height+'px';
+      }
     }
   }
   paintSrc(){

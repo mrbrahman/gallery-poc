@@ -20,10 +20,20 @@ class GAlbum extends HTMLElement {
     
     this.doLayout();
     this.paintLayout();
-    
+
+
+    let parent = this;
     this.shadowRoot.getElementById('container').addEventListener('r3-item-deleted', function handleItemDeleted(evt){
       console.log(`deleted: ${evt.detail.photoid}`);
-      
+      // remove element from the list
+      console.log(parent._data);
+      let removedElementIndex = parent._data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+      parent._data.splice(removedElementIndex, 1);
+
+      // re-calc layout, and paint
+      parent.doLayout();
+      parent.paintLayout();
+
     }, true)
   }
   
@@ -64,7 +74,8 @@ class GAlbum extends HTMLElement {
   }
   
   doLayout(){
-    // console.log('in doLayout');
+    console.log('in doLayout');
+    console.log(`elements ${this._data.length}`)
     let minAspectRatio = this.getMinAspectRatio(), row = [], rowAspectRatio = 0, 
       trX = 0, trY = this._album_name_height;
 
@@ -138,9 +149,12 @@ class GAlbum extends HTMLElement {
           elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
           this.data[i].elem = elem;
           this.shadowRoot.getElementById('container').appendChild(elem);
+        } else {
+          // just update the new position
+          x.elem.width = x.layout.width;
+          x.elem.height = x.layout.height;
+          x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
         }
-        
-        // else item is already in DOM; do nohing
       } else {
         // remove the item from DOM if present
         if(x.elem !== undefined){
