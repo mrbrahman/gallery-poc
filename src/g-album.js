@@ -1,7 +1,6 @@
 class GAlbum extends HTMLElement {
   
-  _width; _gutterspace; _data; _album_name_height;
-  _album_height; 
+  _width; _gutterspace; _data; _album_name_height; _album_height; 
   
   static get observedAttributes() {
     return ['album_name','width','gutterspace','data','data_src'];
@@ -227,8 +226,6 @@ class GAlbum extends HTMLElement {
     return this._album_height;
   }
   set album_height(_){
-    // nothing to set
-    // console.error("We don't set album height");
     this._album_height = +_;
   }
   
