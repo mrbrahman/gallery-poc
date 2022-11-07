@@ -21,7 +21,6 @@ class R3Gallery extends HTMLElement {
   }
 
   connectedCallback() {
-    let cumHeight = 0;
 
     this.shadowRoot.appendChild(
       document.getElementById(this.nodeName).content.cloneNode(true)
@@ -34,24 +33,28 @@ class R3Gallery extends HTMLElement {
         album_name: d.album,
         album_name_height: 50,
         data: d.items,
-        width: document.getElementById('main-content').clientWidth,
+        width: this.shadowRoot.getElementById('gallery').clientWidth,
+        // width: document.getElementById('main-content').clientWidth,
         gutterspace: 4
       });
     
-      album.style.top = cumHeight+'px';
-      album.style.left = '0px';
-
-      this.shadowRoot.getElementById('gallery').appendChild(album);
-      cumHeight += album.album_height + 40; // px between albums
-  
       return album;
     });
 
+    this.shadowRoot.getElementById('gallery').append(...this.#albums);
+    this.reAssignAlbumPositions();
+
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true);
+      .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true)
+    ;
     
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('scroll', this.debounceHandleScroll);
+      .addEventListener('scroll', this.debounceHandleScroll)
+    ;
+    
+    window
+      .addEventListener('resize', this.debounceHandleResize)
+    ;
   }
   
   handleAlbumHeightChange() {
@@ -61,10 +64,23 @@ class R3Gallery extends HTMLElement {
 
   handleScroll() {
     console.log('scroll fired');
-    console.log(this.shadowRoot);
+    // console.log(this.shadowRoot);
   }
 
   debounceHandleScroll = debounce(()=>this.handleScroll(), 100);
+
+  handleResize() {
+    console.log('resize fired');
+    this.#albums.forEach(album=>{
+      album.width = this.shadowRoot.getElementById('gallery').clientWidth;
+      album.doLayout();
+      album.paintLayout();
+    });
+
+    this.reAssignAlbumPositions();
+  }
+
+  debounceHandleResize = debounce(()=>this.handleResize(), 300);
 
 
   reAssignAlbumPositions(){

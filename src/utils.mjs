@@ -1,3 +1,5 @@
+// A simple debounce implementation
+// https://www.freecodecamp.org/news/javascript-debounce-example/
 export function debounce(func, timeout = 300){
   let timer;
   return (...args) => {
