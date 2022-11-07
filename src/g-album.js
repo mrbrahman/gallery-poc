@@ -4,7 +4,7 @@ class GAlbum extends HTMLElement {
   _album_height; 
   
   static get observedAttributes() {
-    return ['albumname','width','gutterspace','data','data_src'];
+    return ['album_name','width','gutterspace','data','data_src'];
   }
   
   constructor() {
@@ -33,15 +33,15 @@ class GAlbum extends HTMLElement {
     // 4. and if height has changed, dispatch an event
 
     // remove element from the list
-    let removedElementIndex = this._data.findIndex((x)=>x.elem.id==evt.detail.photoid)
-    this._data.splice(removedElementIndex, 1);
+    let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+    this.data.splice(removedElementIndex, 1);
 
-    let lastAlbumHeight = this._album_height;
+    let lastAlbumHeight = this.album_height;
     // re-calc layout, and paint
     this.doLayout();
     this.paintLayout();
 
-    if(lastAlbumHeight != this._album_height){
+    if(lastAlbumHeight != this.album_height){
       let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
       this.dispatchEvent(albumHeightChangeEvent);
     }
@@ -50,21 +50,17 @@ class GAlbum extends HTMLElement {
   
   attributeChangedCallback(name, oldValue, newValue) {
     switch(name){
-      case 'albumname':
-        this._name = newValue;
+      case 'album_name':
+        this.album_name = newValue;
         break;
       case 'data':
-        this._data = JSON.parse(newValue).map(x=>{
-          return {
-            data : { ...x }
-          }
-        });
+        this.data = JSON.parse(newValue)
         break;
       case 'width':
-        this._width = +newValue;
+        this.width = newValue;
         break;
       case 'gutterspace':
-        this._gutterspace = +newValue;
+        this.gutterspace = newValue;
         break;
     }
   }
@@ -74,11 +70,11 @@ class GAlbum extends HTMLElement {
   }
   
   getMinAspectRatio(){
-    if (this._width <= 640) {
+    if (this.width <= 640) {
       return 2;
-    } else if (this._width <= 1280) {
+    } else if (this.width <= 1280) {
       return 4;
-    } else if (this._width <= 1920) {
+    } else if (this.width <= 1920) {
       return 5;
     }
     return 6;
@@ -87,13 +83,13 @@ class GAlbum extends HTMLElement {
   doLayout(){
     // console.log('in doLayout');
     let minAspectRatio = this.getMinAspectRatio(), row = [], rowAspectRatio = 0, 
-      trX = 0, trY = this._album_name_height;
+      trX = 0, trY = this.album_name_height;
 
-    this._data.forEach((d,i)=>{
+    this.data.forEach((d,i)=>{
       row.push(d);
       rowAspectRatio += d.data.ar;
       
-      if (rowAspectRatio >= minAspectRatio || i+1 == this._data.length){
+      if (rowAspectRatio >= minAspectRatio || i+1 == this.data.length){
         // we've reached the max items possible in this row, or this is the last element
         
         // calculate row height
@@ -102,15 +98,15 @@ class GAlbum extends HTMLElement {
         // make sure the last image has reasonable height (not too big)
         rowAspectRatio = Math.max(rowAspectRatio, minAspectRatio);
         
-        let totalWidthOfImages = this._width - (this._gutterspace * row.length-1) - this._gutterspace * 2;
+        let totalWidthOfImages = this.width - (this.gutterspace * row.length-1) - this.gutterspace * 2;
         let rowHeight = totalWidthOfImages / rowAspectRatio;
         
         // add gutter space to the Y axis
-        trY += this._gutterspace;
+        trY += this.gutterspace;
         
         // create layout objects for all entries in this row
         for(let r of row){
-          trX += this._gutterspace;
+          trX += this.gutterspace;
           
           let o = {
             id: r.data.photoid,
@@ -134,16 +130,16 @@ class GAlbum extends HTMLElement {
       }
     });
 
-    this._album_height = trY;
-    this.shadowRoot.getElementById('container').style.height = this._album_height+'px';
+    this.album_height = trY;
+    this.shadowRoot.getElementById('container').style.height = this.album_height+'px';
   }
   
   paintLayout(){
     // console.log('in paintLayout')
-    this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this._albumname}</div>`;
-    this.shadowRoot.getElementById('album-name').style.height = this._album_name_height + 'px';
+    this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
+    this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
 
-    this._data.forEach(x=>{
+    this.data.forEach(x=>{
       
       // add/remove/leave as is from DOM as appropriate
       if(true){ // TODO fix this
@@ -158,7 +154,7 @@ class GAlbum extends HTMLElement {
           });
           elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
           
-          // keep reference in this._data
+          // keep reference in this.data
           x.elem = elem;
           
           this.shadowRoot.getElementById('container').appendChild(elem);
@@ -185,11 +181,11 @@ class GAlbum extends HTMLElement {
   }
   // boilerplate
   // return ['name','width','gutterspace','data','data_src'];
-  get albumname(){
-    return this._albumname;
+  get album_name(){
+    return this._album_name;
   }
-  set albumname(_){
-    this._albumname = _;
+  set album_name(_){
+    this._album_name = _;
   }
   
   get width(){
@@ -220,19 +216,20 @@ class GAlbum extends HTMLElement {
     // console.log(this._data)
   }
 
-  get albumnameheight(){
+  get album_name_height(){
     return this._album_name_height;
   }
-  set albumnameheight(_){
+  set album_name_height(_){
     this._album_name_height = +_;
   }
 
-  get albumheight(){
+  get album_height(){
     return this._album_height;
   }
-  set albumheight(_){
+  set album_height(_){
     // nothing to set
-    console.error("We don't set album height");
+    // console.error("We don't set album height");
+    this._album_height = +_;
   }
   
 }

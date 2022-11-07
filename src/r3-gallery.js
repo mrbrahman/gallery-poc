@@ -27,12 +27,12 @@ class R3Gallery extends HTMLElement {
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
 
-    this._albums = this._data.map(d=>{
+    this.albums = this.data.map(d=>{
 
       let album = Object.assign(document.createElement('g-album'), {
         id: d.id,
-        albumname: d.album,
-        albumnameheight: 50,
+        album_name: d.album,
+        album_name_height: 50,
         data: d.items,
         width: document.getElementById('main-content').clientWidth,
         gutterspace: 4
@@ -42,7 +42,7 @@ class R3Gallery extends HTMLElement {
       album.style.left = '0px';
 
       this.shadowRoot.getElementById('gallery').appendChild(album);
-      cumHeight += album.albumheight + 40; // px between albums
+      cumHeight += album.album_height + 40; // px between albums
   
       return album;
     });
@@ -69,11 +69,11 @@ class R3Gallery extends HTMLElement {
 
   reAssignAlbumPositions(){
     let cumHeight = 0;
-    this._albums.forEach(album=>{
+    this.albums.forEach(album=>{
       album.style.top = cumHeight+'px';
       album.style.left = '0px';
 
-      cumHeight += album.albumheight + 40; // px between albums
+      cumHeight += album.album_height + 40; // px between albums
     });
   }
 
