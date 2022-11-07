@@ -115,7 +115,7 @@ class GThumb extends HTMLElement {
     const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: parent._photoid} });
     this.shadowRoot.querySelector('sl-icon-button[name="trash"]').addEventListener('click', function itemDeleted(){
       // TODO: delete item from system (make REST call)
-      console.log('dispatching delete event');
+      // console.log('dispatching delete event');
       parent.dispatchEvent(deleteEvent);
       parent.shadowRoot.querySelector('#container').classList.add('removed');
       // TODO: add listener to wait for CSS animation completion, rather than hardcode ms

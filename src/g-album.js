@@ -23,16 +23,27 @@ class GAlbum extends HTMLElement {
 
 
     let parent = this;
+
     this.shadowRoot.getElementById('container').addEventListener('r3-item-deleted', function handleItemDeleted(evt){
-      console.log(`deleted: ${evt.detail.photoid}`);
+      // if an item from this album is deleted, 
+      // 1. remove references to the item,
+      // 2. recompute album layout, 
+      // 3. paint album 
+      // 4. and if height has changed, dispatch an event
+
       // remove element from the list
-      console.log(parent._data);
       let removedElementIndex = parent._data.findIndex((x)=>x.elem.id==evt.detail.photoid)
       parent._data.splice(removedElementIndex, 1);
 
+      let lastAlbumHeight = parent._album_height;
       // re-calc layout, and paint
       parent.doLayout();
       parent.paintLayout();
+
+      if(lastAlbumHeight != parent._album_height){
+        let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+        parent.dispatchEvent(albumHeightChangeEvent);
+      }
 
     }, true)
   }
@@ -74,8 +85,7 @@ class GAlbum extends HTMLElement {
   }
   
   doLayout(){
-    console.log('in doLayout');
-    console.log(`elements ${this._data.length}`)
+    // console.log('in doLayout');
     let minAspectRatio = this.getMinAspectRatio(), row = [], rowAspectRatio = 0, 
       trX = 0, trY = this._album_name_height;
 
@@ -133,7 +143,7 @@ class GAlbum extends HTMLElement {
     this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this._albumname}</div>`;
     this.shadowRoot.getElementById('album-name').style.height = this._album_name_height + 'px';
 
-    this._data.forEach((x,i)=>{
+    this._data.forEach(x=>{
       
       // add/remove/leave as is from DOM as appropriate
       if(true){ // TODO fix this
@@ -147,7 +157,10 @@ class GAlbum extends HTMLElement {
             rating: x.data.rating
           });
           elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
-          this.data[i].elem = elem;
+          
+          // keep reference in this._data
+          x.elem = elem;
+          
           this.shadowRoot.getElementById('container').appendChild(elem);
         } else {
           // just update the new position

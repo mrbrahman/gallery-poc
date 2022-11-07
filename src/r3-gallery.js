@@ -6,11 +6,12 @@
 
 // data or data_src are okay
 
+import {debounce} from './utils.mjs';
 
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  _cum_height = 0; _albums;
+  albums;
   // variables that can be get/set
   _data;
 
@@ -20,6 +21,8 @@ class R3Gallery extends HTMLElement {
   }
 
   connectedCallback() {
+    let cumHeight = 0;
+
     this.shadowRoot.appendChild(
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
@@ -35,23 +38,40 @@ class R3Gallery extends HTMLElement {
         gutterspace: 4
       });
     
-      album.style.top = this._cum_height+'px';
+      album.style.top = cumHeight+'px';
       album.style.left = '0px';
 
       this.shadowRoot.getElementById('gallery').appendChild(album);
-      this._cum_height += album.albumheight + 40; // px between albums
+      cumHeight += album.albumheight + 40; // px between albums
   
       return album;
     });
-    
-    this.shadowRoot.getElementById('gallery').addEventListener('scroll', function(event){
-      console.log('scroll fired');
-    });
 
-    this.shadowRoot.getElementById('gallery').addEventListener('album-height-changed', function handleAlbumHeightChange(evt){
-      // apply "top" changes to all albums after this one
-    })
+    let parent = this;
+    
+    this.shadowRoot.getElementById('gallery').addEventListener('r3-album-height-changed', function handleAlbumHeightChange(evt){
+      // apply "style: top" changes to all albums after this one
+      parent.reAssignAlbumPositions();
+    }, true);
+    
+    this.shadowRoot.getElementById('gallery').addEventListener('scroll', this.debounceHandleScroll);
+  }
   
+  handleScroll() {
+    console.log('scroll fired');
+  }
+
+  debounceHandleScroll = debounce(()=>this.handleScroll(), 100);
+
+
+  reAssignAlbumPositions(){
+    let cumHeight = 0;
+    this._albums.forEach(album=>{
+      album.style.top = cumHeight+'px';
+      album.style.left = '0px';
+
+      cumHeight += album.albumheight + 40; // px between albums
+    });
   }
 
   disconnectedCallback() {
