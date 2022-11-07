@@ -11,7 +11,7 @@ import {debounce} from './utils.mjs';
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  albums;
+  $albums;
   // variables that can be get/set
   _data;
 
@@ -27,7 +27,7 @@ class R3Gallery extends HTMLElement {
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
 
-    this.albums = this.data.map(d=>{
+    this.$albums = this.data.map(d=>{
 
       let album = Object.assign(document.createElement('g-album'), {
         id: d.id,
@@ -69,7 +69,7 @@ class R3Gallery extends HTMLElement {
 
   reAssignAlbumPositions(){
     let cumHeight = 0;
-    this.albums.forEach(album=>{
+    this.$albums.forEach(album=>{
       album.style.top = cumHeight+'px';
       album.style.left = '0px';
 
