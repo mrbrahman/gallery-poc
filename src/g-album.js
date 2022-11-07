@@ -21,31 +21,31 @@ class GAlbum extends HTMLElement {
     this.doLayout();
     this.paintLayout();
 
+    this.shadowRoot.getElementById('container')
+      .addEventListener('r3-item-deleted', this.handleItemDeleted.bind(this), true)
+  }
 
-    let parent = this;
+  handleItemDeleted(evt){
+    // if an item from this album is deleted, 
+    // 1. remove references to the item,
+    // 2. recompute album layout, 
+    // 3. paint album 
+    // 4. and if height has changed, dispatch an event
 
-    this.shadowRoot.getElementById('container').addEventListener('r3-item-deleted', function handleItemDeleted(evt){
-      // if an item from this album is deleted, 
-      // 1. remove references to the item,
-      // 2. recompute album layout, 
-      // 3. paint album 
-      // 4. and if height has changed, dispatch an event
+    // remove element from the list
+    let removedElementIndex = this._data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+    this._data.splice(removedElementIndex, 1);
 
-      // remove element from the list
-      let removedElementIndex = parent._data.findIndex((x)=>x.elem.id==evt.detail.photoid)
-      parent._data.splice(removedElementIndex, 1);
+    let lastAlbumHeight = this._album_height;
+    // re-calc layout, and paint
+    this.doLayout();
+    this.paintLayout();
 
-      let lastAlbumHeight = parent._album_height;
-      // re-calc layout, and paint
-      parent.doLayout();
-      parent.paintLayout();
+    if(lastAlbumHeight != this._album_height){
+      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+      this.dispatchEvent(albumHeightChangeEvent);
+    }
 
-      if(lastAlbumHeight != parent._album_height){
-        let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
-        parent.dispatchEvent(albumHeightChangeEvent);
-      }
-
-    }, true)
   }
   
   attributeChangedCallback(name, oldValue, newValue) {

@@ -20,6 +20,7 @@ class GThumb extends HTMLElement {
     this.inDOM = true;
     
     // console.log('in connected callback');
+    // TODO: handle this properly. rating can have 0 value
     // if(!(this._photoid && this._rating && this._width && this._height) ){
     //   return;
     // }
@@ -102,27 +103,39 @@ class GThumb extends HTMLElement {
     this.paintSelected();
     
     // setup event listeners
-    let parent = this;
-    this.shadowRoot.querySelector('input[type="checkbox"]').addEventListener('click', function handleSelection(){
-      parent._selected = this.checked;
-    });
+    this.shadowRoot.querySelector('input[type="checkbox"]')
+      .addEventListener('click', this.handleSelection.bind(this));
     
-    this.shadowRoot.querySelector('sl-rating').addEventListener('sl-change', function slRatingChanged(){
-      parent._rating = this.value;
-      console.log(`new value: ${this.value} to be updated in db`);
-    });
+    this.shadowRoot.querySelector('sl-rating')
+      .addEventListener('sl-change', this.slRatingChanged.bind(this));
     
-    const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: parent._photoid} });
-    this.shadowRoot.querySelector('sl-icon-button[name="trash"]').addEventListener('click', function itemDeleted(){
-      // TODO: delete item from system (make REST call)
-      // console.log('dispatching delete event');
-      parent.dispatchEvent(deleteEvent);
-      parent.shadowRoot.querySelector('#container').classList.add('removed');
-      // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
-      setTimeout(()=>{parent.remove()}, 300);
-    })
+    this.shadowRoot.querySelector('sl-icon-button[name="trash"]')
+    .addEventListener('click', this.itemDeleted.bind(this))
     
   }
+
+  handleSelection(evt){
+    this.selected = evt.target.checked;
+  }
+
+  slRatingChanged(evt){
+    console.log(`new value: ${evt.target.value} to be updated in db`);
+    this._rating = evt.target.value;
+}
+  
+  itemDeleted(evt){
+    // TODO: delete item from system (make REST call)
+    // console.log('dispatching delete event');
+    console.log('Delete from server/db here for photoid '+this._photoid);
+
+    const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: this._photoid} });
+    this.dispatchEvent(deleteEvent);
+    this.shadowRoot.querySelector('#container').classList.add('removed');
+    // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
+    setTimeout(()=>{this.remove()}, 300);
+  }
+
+
   
   // individual paint functions
   // checking for this.inDOM in each, as these also get triggered for static elements

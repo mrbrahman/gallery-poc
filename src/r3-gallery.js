@@ -47,18 +47,21 @@ class R3Gallery extends HTMLElement {
       return album;
     });
 
-    let parent = this;
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true);
     
-    this.shadowRoot.getElementById('gallery').addEventListener('r3-album-height-changed', function handleAlbumHeightChange(evt){
-      // apply "style: top" changes to all albums after this one
-      parent.reAssignAlbumPositions();
-    }, true);
-    
-    this.shadowRoot.getElementById('gallery').addEventListener('scroll', this.debounceHandleScroll);
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('scroll', this.debounceHandleScroll);
   }
   
+  handleAlbumHeightChange() {
+    // apply "style: top" changes to all albums after this one
+    this.reAssignAlbumPositions();
+  }
+
   handleScroll() {
     console.log('scroll fired');
+    console.log(this.shadowRoot);
   }
 
   debounceHandleScroll = debounce(()=>this.handleScroll(), 100);
