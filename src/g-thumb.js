@@ -45,23 +45,19 @@ class GThumb extends HTMLElement {
     // console.log(`setting ${name} from *${oldValue}* to *${newValue}*`)
     switch(name){
       case 'photoid':
-        this._photoid = newValue;
+        this.photoid = newValue;
         break;
       case 'width':
-        this._width = +newValue;
-        this.paintWidth();
+        this.width = newValue;
         break;
       case 'height':
-        this._height = +newValue;
-        this.paintHeight();
+        this.height = newValue;
         break;
       case 'rating':
-        this._rating = newValue;
-        this.paintRating();
+        this.rating = newValue;
         break;
       case 'selected':
-        this._selected = newValue == null ? false : true;
-        this.paintSelected();
+        this.selected = newValue == null ? false : true;
         break;
     }
   }
@@ -120,15 +116,15 @@ class GThumb extends HTMLElement {
 
   slRatingChanged(evt){
     console.log(`new value: ${evt.target.value} to be updated in db`);
-    this._rating = evt.target.value;
+    this.rating = evt.target.value;
 }
   
   itemDeleted(evt){
     // TODO: delete item from system (make REST call)
     // console.log('dispatching delete event');
-    console.log('Delete from server/db here for photoid '+this._photoid);
+    console.log('Delete from server/db here for photoid '+this.photoid);
 
-    const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: this._photoid} });
+    const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: this.photoid} });
     this.dispatchEvent(deleteEvent);
     this.shadowRoot.querySelector('#container').classList.add('removed');
     // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
@@ -142,19 +138,19 @@ class GThumb extends HTMLElement {
   // that use attributeChangedCallback to set the values before connectedComponents is called
   paintWidth(){
     if(this.inDOM){
-      this.shadowRoot.getElementById('container').style.width = this._width+'px';
+      this.shadowRoot.getElementById('container').style.width = this.width+'px';
       // img element is not present during initial paint
       if (this.shadowRoot.querySelector('img')){
-        this.shadowRoot.querySelector('img').style.width = this._width+'px';
+        this.shadowRoot.querySelector('img').style.width = this.width+'px';
       }
     }
   }
   paintHeight(){
     if(this.inDOM){
-      this.shadowRoot.getElementById('container').style.height = this._height+'px';
+      this.shadowRoot.getElementById('container').style.height = this.height+'px';
       // img element is not present during initial paint
       if(this.shadowRoot.querySelector('img')){
-        this.shadowRoot.querySelector('img').style.height = this._height+'px';
+        this.shadowRoot.querySelector('img').style.height = this.height+'px';
       }
     }
   }
@@ -164,24 +160,24 @@ class GThumb extends HTMLElement {
       img.onload = function(){
         this.classList.add('ready');
       };
-      // console.log(`need ${this._height * this.dppx} px`)
-      img.src = `https://picsum.photos/id/${this._photoid}/${Math.round(this._width)}/${Math.round(this._height)}`;
+      // console.log(`need ${this.height * this.dppx} px`)
+      img.src = `https://picsum.photos/id/${this.photoid}/${Math.round(this.width)}/${Math.round(this.height)}`;
     } 
   }
   paintRating(){
     if(this.inDOM){
-      this.shadowRoot.querySelector('sl-rating').value = this._rating;
+      this.shadowRoot.querySelector('sl-rating').value = this.rating;
     }
   }
   paintSelected(){
     if(this.inDOM){
-      this.shadowRoot.querySelector('input[type="checkbox"]').checked = this._selected;
+      this.shadowRoot.querySelector('input[type="checkbox"]').checked = this.selected;
     }
   }
   
   // boilerplate stuff
   get photoid(){
-    return this._width;
+    return this._photoid;
   }
   set photoid(_){
     this._photoid = _;
