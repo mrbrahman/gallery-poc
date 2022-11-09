@@ -6,7 +6,7 @@
 
 // data or data_src are okay
 
-import {debounce} from './utils.mjs';
+import {debounce, throttle} from './utils.mjs';
 
 class R3Gallery extends HTMLElement {
 
@@ -49,7 +49,7 @@ class R3Gallery extends HTMLElement {
     ;
     
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('scroll', this.debounceHandleScroll)
+      .addEventListener('scroll', this.throttleHandleScroll)
     ;
     
     window
@@ -133,7 +133,7 @@ class R3Gallery extends HTMLElement {
     })
   }
 
-  debounceHandleScroll = debounce(()=>this.selectivelyPaintAlbums(), 100);
+  throttleHandleScroll = throttle(()=>this.selectivelyPaintAlbums(), 100);
 
   handleResize() {
     // apply the new width to all albums
