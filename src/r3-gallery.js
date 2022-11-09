@@ -74,7 +74,7 @@ class R3Gallery extends HTMLElement {
     this.selectivelyPaintAlbums();
   }
 
-  selectivelyPaintAlbums() {
+  selectivelyPaintAlbums(force = true) {
     
     //   --------------------------------------- bufferTop (-ve value)
     //
@@ -113,19 +113,39 @@ class R3Gallery extends HTMLElement {
       let albumTop = album.offsetTop + scrollTop, albumBottom = albumTop + album.album_height;
       // console.log(`id: ${album.id} albumTop ${albumTop} albumBottom ${albumBottom}`)
 
+      
+      if (
+        !force &&
+        this.#currentlyVisibleAlbums[album.id] && this.#currentlyVisibleAlbums[album.id] == 'full' &&
+        (albumBottom >= bufferTop && albumBottom <= bufferBottom) &&
+        (albumTop    >= bufferTop && albumTop    <= bufferBottom)
+      ) {
+        // don't need to do anything
+        return;
+      }
+
       // if albumTop is within the buffer or albumBottom is within the buffer, we need to show
       // (at least part of) the album
-      if ((albumBottom >= bufferTop && albumBottom <= bufferBottom) ||
-          (albumTop    >= bufferTop && albumTop    <= bufferBottom))
-      {
-        // console.log(`   show ${album.id}`);
+      if (
+        (albumBottom >= bufferTop && albumBottom <= bufferBottom) ||
+        (albumTop    >= bufferTop && albumTop    <= bufferBottom)
+      ) {
         album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
-        this.#currentlyVisibleAlbums[album.id] = true;
-        // todo
+        
+        if ((albumBottom >= bufferTop && albumBottom <= bufferBottom) &&
+            (albumTop    >= bufferTop && albumTop    <= bufferBottom)){
+          this.#currentlyVisibleAlbums[album.id] = 'full';
 
+        } else {
+          this.#currentlyVisibleAlbums[album.id] = 'partial';
+        }
+        
       } else {
+        // the album is not within the buffered area
+        
         if(this.#currentlyVisibleAlbums[album.id]){
-          // console.log(`   remove ${album.id}`);
+          // if the album was in the buffered area before, selectively paint layout once more,
+          // so any visible thumbs can be removed
           album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
           delete this.#currentlyVisibleAlbums[album.id];
         }
@@ -133,7 +153,7 @@ class R3Gallery extends HTMLElement {
     })
   }
 
-  throttleHandleScroll = throttle(()=>this.selectivelyPaintAlbums(), 100);
+  throttleHandleScroll = throttle(()=>this.selectivelyPaintAlbums(false), 100);
 
   handleResize() {
     // apply the new width to all albums
