@@ -219,7 +219,15 @@
     }
 
     // let picsumGallery = [{page: 5, limit:3}]
-    let picsumGallery = [{page: 2, limit:12}, {page:3, limit:15}, {page:4, limit:4}, {page: 1, limit: 10}]
+    let picsumGallery = [
+      {page: 2, limit:24}, 
+      {page:3, limit:48}, 
+      {page:4, limit:4}, 
+      {page: 5, limit: 40},
+      {page: 6, limit: 60},
+      {page: 7, limit: 30},
+      {page: 8, limit: 82}
+    ]
 
     let dataPromises = picsumGallery.map(async function(gItem){
       let albumData = await makePicsumAlbum(gItem);
