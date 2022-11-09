@@ -17,34 +17,12 @@ class GAlbum extends HTMLElement {
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
     
+    this.paintName();
     this.doLayout();
-    this.paintLayout();
+    // painting of layout will selectively happen from the wrapper, so not doing anything here
 
     this.shadowRoot.getElementById('container')
       .addEventListener('r3-item-deleted', this.handleItemDeleted.bind(this), true)
-  }
-
-  handleItemDeleted(evt){
-    // if an item from this album is deleted, 
-    // 1. remove references to the item,
-    // 2. recompute album layout, 
-    // 3. paint album 
-    // 4. and if height has changed, dispatch an event
-
-    // remove element from the list
-    let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
-    this.data.splice(removedElementIndex, 1);
-
-    let lastAlbumHeight = this.album_height;
-    // re-calc layout, and paint
-    this.doLayout();
-    this.paintLayout();
-
-    if(lastAlbumHeight != this.album_height){
-      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
-      this.dispatchEvent(albumHeightChangeEvent);
-    }
-
   }
   
   attributeChangedCallback(name, oldValue, newValue) {
@@ -64,8 +42,32 @@ class GAlbum extends HTMLElement {
     }
   }
 
+
   disconnectedCallback() {
     
+  }
+
+  handleItemDeleted(evt){
+    // if an item from this album is deleted, 
+    // 1. remove references to the item,
+    // 2. recompute album layout, 
+    // 3. and if height has changed, dispatch an event
+
+    // remove element from the list
+    let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+    this.data.splice(removedElementIndex, 1);
+
+    let lastAlbumHeight = this.album_height;
+    // re-calc layout
+    this.doLayout();
+
+    // if there is any height change resulting from this delete, fire an event, so 
+    // the wrapper r3-gallery can paint as needed
+    if(lastAlbumHeight != this.album_height){
+      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+      this.dispatchEvent(albumHeightChangeEvent);
+    }
+
   }
   
   getMinAspectRatio(){
@@ -111,7 +113,7 @@ class GAlbum extends HTMLElement {
             id: r.data.photoid,
             width: r.data.ar * rowHeight,
             height: rowHeight,
-            offsetHeight: trY + rowHeight, // will be useful when painting
+            offsetHeight: trY, // will be useful when painting
             trX: trX + 'px',
             trY: trY + 'px'
           };
@@ -133,15 +135,18 @@ class GAlbum extends HTMLElement {
     this.shadowRoot.getElementById('container').style.height = this.album_height+'px';
   }
   
-  paintLayout(){
-    // console.log('in paintLayout')
-    this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
-    this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
+  selectivelyPaintLayout(bufferTop, bufferBottom, albumTop){
+    // console.log('in selectivelyPaintLayout')
 
     this.data.forEach(x=>{
+
+      let thumbTop = albumTop + x.layout.offsetHeight, thumbBottom = thumbTop + x.height;
       
       // add/remove/leave as is from DOM as appropriate
-      if(true){ // TODO fix this
+      if ((thumbTop    >= bufferTop && thumbTop    <= bufferBottom) ||
+          (thumbBottom >= bufferTop && thumbBottom <= bufferBottom))
+      {
+        // album is within the boundaries
         if(x.elem == undefined){
           // create element in dom
           let elem = Object.assign(document.createElement('g-thumb'), {
@@ -157,26 +162,33 @@ class GAlbum extends HTMLElement {
           x.elem = elem;
           
           this.shadowRoot.getElementById('container').appendChild(elem);
+
+        } else if (!x.elem.inDOM){
+          // the thumb was removed, but element (class) was found - just append the element back into the DOM
+          this.shadowRoot.getElementById('container').appendChild(x.elem);
         } else {
-          // just update the new position
+          // just update the new position (for resize / delete events)
           x.elem.width = x.layout.width;
           x.elem.height = x.layout.height;
           x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
         }
       } else {
+        // album is not within boundaries
+
         // remove the item from DOM if present
         if(x.elem !== undefined){
           // remove element in shadow dom
           x.elem.remove();
-          delete x.elem; // remove any references, so the HTMLElement can be garbage collected
         }
       }
       
     })
   }
-  
+
+
   paintName(){
-    
+    this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
+    this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
   }
   // boilerplate
   // return ['name','width','gutterspace','data','data_src'];

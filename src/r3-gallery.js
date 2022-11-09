@@ -11,7 +11,7 @@ import {debounce} from './utils.mjs';
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  #albums;
+  #albums = []; #currentlyVisibleAlbums = {};
   // variables that can be get/set
   _data;
 
@@ -34,7 +34,6 @@ class R3Gallery extends HTMLElement {
         album_name_height: 50,
         data: d.items,
         width: this.shadowRoot.getElementById('gallery').clientWidth,
-        // width: document.getElementById('main-content').clientWidth,
         gutterspace: 4
       });
     
@@ -43,6 +42,7 @@ class R3Gallery extends HTMLElement {
 
     this.shadowRoot.getElementById('gallery').append(...this.#albums);
     this.reAssignAlbumPositions();
+    this.selectivelyPaintAlbums();
 
     this.shadowRoot.getElementById('gallery')
       .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true)
@@ -56,32 +56,6 @@ class R3Gallery extends HTMLElement {
       .addEventListener('resize', this.debounceHandleResize)
     ;
   }
-  
-  handleAlbumHeightChange() {
-    // apply "style: top" changes to all albums after this one
-    this.reAssignAlbumPositions();
-  }
-
-  handleScroll() {
-    console.log('scroll fired');
-    // console.log(this.shadowRoot);
-  }
-
-  debounceHandleScroll = debounce(()=>this.handleScroll(), 100);
-
-  handleResize() {
-    console.log('resize fired');
-    this.#albums.forEach(album=>{
-      album.width = this.shadowRoot.getElementById('gallery').clientWidth;
-      album.doLayout();
-      album.paintLayout();
-    });
-
-    this.reAssignAlbumPositions();
-  }
-
-  debounceHandleResize = debounce(()=>this.handleResize(), 300);
-
 
   reAssignAlbumPositions(){
     let cumHeight = 0;
@@ -92,6 +66,90 @@ class R3Gallery extends HTMLElement {
       cumHeight += album.album_height + 40; // px between albums
     });
   }
+  
+  handleAlbumHeightChange() {
+    // apply "style: top" changes to all albums
+    this.reAssignAlbumPositions();
+    // bring more items to the buffer, if necessary
+    this.selectivelyPaintAlbums();
+  }
+
+  selectivelyPaintAlbums() {
+    
+    //   --------------------------------------- bufferTop (-ve value)
+    //
+    //
+    //
+    //   --------------------------------------- 0px
+    //                    ^
+    //                    |
+    //                    |
+    //                 Viewport
+    //                    |
+    //                    |
+    //                    v
+    //   ---------------------------------------
+    //
+    //
+    //
+    //   --------------------------------------- bufferBottom
+    
+    // for easy comparisons, we convert scroll to a -ve number
+    
+    let scrollTop = -this.shadowRoot.getElementById('gallery').scrollTop;
+    // console.log(`scrollTop ${scrollTop}`)
+    
+    // we make the buffers on each side 3 times the size of the screen
+
+    // bufferTop: px above the top of the viewport
+    // bufferBottom: px below the bottom of the viewport
+    let viewportHeight = this.shadowRoot.getElementById('gallery').clientHeight,
+      bufferTop = viewportHeight * -3, 
+      bufferBottom = viewportHeight * (1+3);
+    
+    // console.log(`bufferTop ${bufferTop} bufferBottom ${bufferBottom}`)
+    
+    this.#albums.forEach(album=>{
+      let albumTop = album.offsetTop + scrollTop, albumBottom = albumTop + album.album_height;
+      // console.log(`id: ${album.id} albumTop ${albumTop} albumBottom ${albumBottom}`)
+
+      // if albumTop is within the buffer or albumBottom is within the buffer, we need to show
+      // (at least part of) the album
+      if ((albumBottom >= bufferTop && albumBottom <= bufferBottom) ||
+          (albumTop    >= bufferTop && albumTop    <= bufferBottom))
+      {
+        // console.log(`   show ${album.id}`);
+        album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
+        this.#currentlyVisibleAlbums[album.id] = true;
+        // todo
+
+      } else {
+        if(this.#currentlyVisibleAlbums[album.id]){
+          // console.log(`   remove ${album.id}`);
+          album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
+          delete this.#currentlyVisibleAlbums[album.id];
+        }
+      }
+    })
+  }
+
+  debounceHandleScroll = debounce(()=>this.selectivelyPaintAlbums(), 100);
+
+  handleResize() {
+    // apply the new width to all albums
+    this.reAssignAlbumWidths();
+    // re-assign album positions, and selectively paint
+    this.handleAlbumHeightChange();
+  }
+  
+  reAssignAlbumWidths(){
+    this.#albums.forEach(album=>{
+      album.width = this.shadowRoot.getElementById('gallery').clientWidth;
+      album.doLayout();
+    });
+  }
+
+  debounceHandleResize = debounce(()=>this.handleResize(), 300);
 
   disconnectedCallback() {
     //implementation
