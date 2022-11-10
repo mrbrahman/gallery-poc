@@ -11,7 +11,7 @@ import {debounce, throttle} from './utils.mjs';
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  #albums = []; #currentlyVisibleAlbums = {};
+  #albums = []; #albumsInBuffer = {};
   // variables that can be get/set
   _data;
 
@@ -53,7 +53,7 @@ class R3Gallery extends HTMLElement {
     ;
     
     window
-      .addEventListener('resize', this.debounceHandleResize)
+      .addEventListener('resize', this.throttleHandleResize)
     ;
   }
 
@@ -74,7 +74,7 @@ class R3Gallery extends HTMLElement {
     this.selectivelyPaintAlbums();
   }
 
-  selectivelyPaintAlbums(force = true) {
+  selectivelyPaintAlbums(forceRepaint = true) {
     
     //   --------------------------------------- bufferTop (-ve value)
     //
@@ -113,44 +113,54 @@ class R3Gallery extends HTMLElement {
       let albumTop = album.offsetTop + scrollTop, albumBottom = albumTop + album.album_height;
       // console.log(`id: ${album.id} albumTop ${albumTop} albumBottom ${albumBottom}`)
 
+      let albumBottomInBuffer = () => (albumBottom >= bufferTop && albumBottom <= bufferBottom);
+      let albumTopInBuffer    = () => (albumTop    >= bufferTop && albumTop    <= bufferBottom);
+      let albumEncompassesBuffer = () => (albumTop <= bufferTop && albumBottom >= bufferBottom);
       
+      // in case the full album was already loaded in the buffer, and the entire album continues to exist,
+      // take a shortcut and no need to adjust anything, unless explicitly set during the function call.
+      
+      // for e.g. scroll doesn't need to repaint everything, however, a delete or album height change will
+      // need to repaint even though the entire album may have already been loaded and contines to exist in the buffer
       if (
-        !force &&
-        this.#currentlyVisibleAlbums[album.id] && this.#currentlyVisibleAlbums[album.id] == 'full' &&
-        (albumBottom >= bufferTop && albumBottom <= bufferBottom) &&
-        (albumTop    >= bufferTop && albumTop    <= bufferBottom)
+        !forceRepaint &&
+        this.#albumsInBuffer[album.id] && this.#albumsInBuffer[album.id] == 'full' && // full album is loaded
+        albumBottomInBuffer() && albumTopInBuffer()
       ) {
         // don't need to do anything
+        console.log(`not doing ${album.id}`)
         return;
       }
 
+      if (albumEncompassesBuffer()){
+        this.#albumsInBuffer[album.id] = 'buffer-overflow';
+        album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
+      }
       // if albumTop is within the buffer or albumBottom is within the buffer, we need to show
       // (at least part of) the album
-      if (
-        (albumBottom >= bufferTop && albumBottom <= bufferBottom) ||
-        (albumTop    >= bufferTop && albumTop    <= bufferBottom)
-      ) {
+      else if (albumBottomInBuffer() || albumTopInBuffer()) {
         album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
         
-        if ((albumBottom >= bufferTop && albumBottom <= bufferBottom) &&
-            (albumTop    >= bufferTop && albumTop    <= bufferBottom)){
-          this.#currentlyVisibleAlbums[album.id] = 'full';
+        if (albumBottomInBuffer() && albumTopInBuffer()){
+          this.#albumsInBuffer[album.id] = 'full';
 
         } else {
-          this.#currentlyVisibleAlbums[album.id] = 'partial';
+          this.#albumsInBuffer[album.id] = 'partial';
         }
         
       } else {
         // the album is not within the buffered area
         
-        if(this.#currentlyVisibleAlbums[album.id]){
+        if(this.#albumsInBuffer[album.id]){
           // if the album was in the buffered area before, selectively paint layout once more,
           // so any visible thumbs can be removed
           album.selectivelyPaintLayout(bufferTop, bufferBottom, albumTop);
-          delete this.#currentlyVisibleAlbums[album.id];
+          delete this.#albumsInBuffer[album.id];
         }
       }
-    })
+    });
+
+    console.log(this.#albumsInBuffer)
   }
 
   throttleHandleScroll = throttle(()=>this.selectivelyPaintAlbums(false), 100);
@@ -169,7 +179,8 @@ class R3Gallery extends HTMLElement {
     });
   }
 
-  debounceHandleResize = debounce(()=>this.handleResize(), 300);
+  //debounceHandleResize = debounce(()=>this.handleResize(), 300);
+  throttleHandleResize = throttle(()=>this.handleResize(), 100);
 
   disconnectedCallback() {
     //implementation
