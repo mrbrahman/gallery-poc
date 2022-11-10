@@ -104,8 +104,8 @@ class R3Gallery extends HTMLElement {
     // bufferTop: px above the top of the viewport
     // bufferBottom: px below the bottom of the viewport
     let viewportHeight = this.shadowRoot.getElementById('gallery').clientHeight,
-      bufferTop = viewportHeight * -3, 
-      bufferBottom = viewportHeight * (1+3);
+      bufferTop = viewportHeight * -6, 
+      bufferBottom = viewportHeight * (1+6);
     
     // console.log(`bufferTop ${bufferTop} bufferBottom ${bufferBottom}`)
     
