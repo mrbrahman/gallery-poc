@@ -23,6 +23,7 @@ class GAlbum extends HTMLElement {
 
     this.shadowRoot.getElementById('container')
       .addEventListener('r3-item-deleted', this.handleItemDeleted.bind(this), true)
+    ;
   }
   
   attributeChangedCallback(name, oldValue, newValue) {
@@ -44,7 +45,9 @@ class GAlbum extends HTMLElement {
 
 
   disconnectedCallback() {
-    
+    this.shadowRoot.getElementById('container')
+    .removeEventListener('r3-item-deleted', this.handleItemDeleted)
+    ;
   }
 
   handleItemDeleted(evt){
