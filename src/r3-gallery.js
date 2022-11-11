@@ -183,7 +183,17 @@ class R3Gallery extends HTMLElement {
   throttleHandleResize = throttle(()=>this.handleResize(), 100);
 
   disconnectedCallback() {
-    //implementation
+    this.shadowRoot.getElementById('gallery')
+      .removeEventListener('r3-album-height-changed', this.handleAlbumHeightChange)
+    ;
+  
+    this.shadowRoot.getElementById('gallery')
+      .removeEventListener('scroll', this.throttleHandleScroll)
+    ;
+    
+    window
+      .removeEventListener('resize', this.throttleHandleResize)
+    ;
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -191,7 +201,7 @@ class R3Gallery extends HTMLElement {
   }
 
   adoptedCallback() {
-    //implementation
+    console.log('in adoptedCallback')
   }
 
   get data(){
