@@ -68,9 +68,6 @@ class GThumb extends HTMLElement {
     this.shadowRoot.querySelector('input[type="checkbox"]').removeEventListener('click', this.handleSelection);
     this.shadowRoot.querySelector('sl-rating').removeEventListener('deleted', this.slRatingChanged);
     this.shadowRoot.querySelector('sl-icon-button[name="trash"]').removeEventListener('sl-change', this.itemDeleted);
-    
-    // remove shadow DOM
-    this.shadowRoot.innerHTML = "";
   }
   
   paintRest(){
