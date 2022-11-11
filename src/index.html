@@ -218,15 +218,34 @@
       });
     }
 
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
+    }
+
     // let picsumGallery = [{page: 5, limit:3}]
     let picsumGallery = [
-      {page: 2, limit:24}, 
-      {page:3, limit:48}, 
-      {page:4, limit:4}, 
-      {page: 5, limit: 40},
-      {page: 6, limit: 60},
-      {page: 7, limit: 30},
-      {page: 8, limit: 82}
+      {page: 2, limit: getRandomInt(1,100)}, 
+      {page: 3, limit: getRandomInt(1,100)}, 
+      {page: 4, limit: getRandomInt(1,100)}, 
+      {page: 5, limit: getRandomInt(1,100)},
+      {page: 6, limit: getRandomInt(1,100)},
+      {page: 7, limit: getRandomInt(1,100)},
+      {page: 8, limit: getRandomInt(1,100)},
+      {page: 9, limit: getRandomInt(1,100)},
+      {page: 10, limit: getRandomInt(1,100)},
+      {page: 11, limit: getRandomInt(1,100)},
+      {page: 12, limit: getRandomInt(1,100)},
+      {page: 13, limit: getRandomInt(1,100)},
+      {page: 14, limit: getRandomInt(1,100)},
+      {page: 15, limit: getRandomInt(1,100)},
+      {page: 16, limit: getRandomInt(1,100)},
+      {page: 17, limit: getRandomInt(1,100)},
+      {page: 18, limit: getRandomInt(1,100)},
+      {page: 19, limit: getRandomInt(1,100)},
+      {page: 20, limit: getRandomInt(1,100)}
+
     ]
 
     let dataPromises = picsumGallery.map(async function(gItem){
