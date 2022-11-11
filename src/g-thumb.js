@@ -1,6 +1,5 @@
 class GThumb extends HTMLElement {
   // instance variables
-  inDOM;
   _photoid; _width; _height; _rating; _selected;
   
   dppx = parseFloat(window.devicePixelRatio.toFixed(2));
@@ -12,12 +11,10 @@ class GThumb extends HTMLElement {
   constructor() {
     // console.log('in constructor')
     super().attachShadow({mode: 'open'}); // sets "this" and "this.shadowRoot"
-    this.inDOM = false;
     // console.log(this.dppx)
   }
 
   connectedCallback() {
-    this.inDOM = true;
     
     // console.log('in connected callback');
     // TODO: handle this properly. rating can have 0 value
@@ -63,7 +60,6 @@ class GThumb extends HTMLElement {
   }
   
   disconnectedCallback() {
-    this.inDOM = false;
     // TODO: can we check if the listner is setup before removing?
     // TODO: also check if we need to remove these listeners explicitly, since we're removing the 
     // shadow DOM anyway, and the listeners should get automatically removed by browser
@@ -79,7 +75,7 @@ class GThumb extends HTMLElement {
   
   paintRest(){
     // if the user is scrolling too fast, and the element is already removed, do not paint anything further
-    if(!this.inDOM){
+    if(!this.isConnected){
       return;
     }
     
@@ -134,10 +130,10 @@ class GThumb extends HTMLElement {
 
   
   // individual paint functions
-  // checking for this.inDOM in each, as these also get triggered for static elements
+  // checking for this.isConnected (i.e in DOM) in each, as these also get triggered for static elements
   // that use attributeChangedCallback to set the values before connectedComponents is called
   paintWidth(){
-    if(this.inDOM){
+    if(this.isConnected){
       this.shadowRoot.getElementById('container').style.width = this.width+'px';
       // img element is not present during initial paint
       if (this.shadowRoot.querySelector('img')){
@@ -146,7 +142,7 @@ class GThumb extends HTMLElement {
     }
   }
   paintHeight(){
-    if(this.inDOM){
+    if(this.isConnected){
       this.shadowRoot.getElementById('container').style.height = this.height+'px';
       // img element is not present during initial paint
       if(this.shadowRoot.querySelector('img')){
@@ -155,7 +151,7 @@ class GThumb extends HTMLElement {
     }
   }
   paintSrc(){
-    if(this.inDOM){
+    if(this.isConnected){
       let img = this.shadowRoot.querySelector('img');
       img.onload = function(){
         this.classList.add('ready');
@@ -165,12 +161,12 @@ class GThumb extends HTMLElement {
     } 
   }
   paintRating(){
-    if(this.inDOM){
+    if(this.isConnected){
       this.shadowRoot.querySelector('sl-rating').value = this.rating;
     }
   }
   paintSelected(){
-    if(this.inDOM){
+    if(this.inisConnected){
       this.shadowRoot.querySelector('input[type="checkbox"]').checked = this.selected;
     }
   }

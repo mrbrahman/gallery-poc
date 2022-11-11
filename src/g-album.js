@@ -163,7 +163,7 @@ class GAlbum extends HTMLElement {
           
           this.shadowRoot.getElementById('container').appendChild(elem);
 
-        } else if (!x.elem.inDOM){
+        } else if (!x.elem.isConnected){
           // the thumb was removed, but element (class) was found - just append the element back into the DOM
           this.shadowRoot.getElementById('container').appendChild(x.elem);
         } else {
