@@ -175,7 +175,7 @@ class R3Gallery extends HTMLElement {
   reAssignAlbumWidths(){
     this.#albums.forEach(album=>{
       album.width = this.shadowRoot.getElementById('gallery').clientWidth;
-      album.doLayout();
+      album.redoLayout();
     });
   }
 

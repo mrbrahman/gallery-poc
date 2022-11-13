@@ -1,6 +1,6 @@
 class GAlbum extends HTMLElement {
   
-  _width; _gutterspace; _data; _album_name_height; _album_height; 
+  #width; #gutterspace; #data; #album_name_height; #album_height; 
   
   static get observedAttributes() {
     return ['album_name','width','gutterspace','data','data_src'];
@@ -17,12 +17,12 @@ class GAlbum extends HTMLElement {
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
     
-    this.paintName();
-    this.doLayout();
+    this.#paintName();
+    this.#doLayout();
     // painting of layout will selectively happen from the wrapper, so not doing anything here
 
     this.shadowRoot.getElementById('container')
-      .addEventListener('r3-item-deleted', this.handleItemDeleted.bind(this), true)
+      .addEventListener('r3-item-deleted', this.#handleItemDeleted.bind(this), true)
     ;
   }
   
@@ -46,11 +46,11 @@ class GAlbum extends HTMLElement {
 
   disconnectedCallback() {
     this.shadowRoot.getElementById('container')
-    .removeEventListener('r3-item-deleted', this.handleItemDeleted)
+    .removeEventListener('r3-item-deleted', this.#handleItemDeleted)
     ;
   }
 
-  handleItemDeleted(evt){
+  #handleItemDeleted(evt){
     // if an item from this album is deleted, 
     // 1. remove references to the item,
     // 2. recompute album layout, 
@@ -62,7 +62,7 @@ class GAlbum extends HTMLElement {
 
     let lastAlbumHeight = this.album_height;
     // re-calc layout
-    this.doLayout();
+    this.#doLayout();
 
     // if there is any height change resulting from this delete, fire an event, so 
     // the wrapper r3-gallery can paint as needed
@@ -73,7 +73,7 @@ class GAlbum extends HTMLElement {
 
   }
   
-  getMinAspectRatio(){
+  #getMinAspectRatio(){
     if (this.width <= 640) {
       return 2;
     } else if (this.width <= 1280) {
@@ -84,9 +84,11 @@ class GAlbum extends HTMLElement {
     return 6;
   }
   
-  doLayout(){
-    // console.log('in doLayout');
-    let minAspectRatio = this.getMinAspectRatio(), row = [], rowAspectRatio = 0, 
+  #doLayout(){
+    // console.log('in #doLayout');
+    console.log('width: '+this.clientWidth)
+    // console.log('width: '+this.#width)
+    let minAspectRatio = this.#getMinAspectRatio(), row = [], rowAspectRatio = 0, 
       trX = 0, trY = this.album_name_height;
 
     this.data.forEach((d,i)=>{
@@ -137,6 +139,8 @@ class GAlbum extends HTMLElement {
     this.album_height = trY;
     this.shadowRoot.getElementById('container').style.height = this.album_height+'px';
   }
+
+  redoLayout = this.#doLayout;
   
   selectivelyPaintLayout(bufferTop, bufferBottom, albumTop){
     // console.log('in selectivelyPaintLayout')
@@ -189,12 +193,11 @@ class GAlbum extends HTMLElement {
   }
 
 
-  paintName(){
+  #paintName(){
     this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
     this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
   }
   // boilerplate
-  // return ['name','width','gutterspace','data','data_src'];
   get album_name(){
     return this._album_name;
   }
@@ -203,45 +206,44 @@ class GAlbum extends HTMLElement {
   }
   
   get width(){
-    return this._width;
+    return this.#width;
   }
   set width(_){
-    this._width = _;
+    this.#width = _;
   }
 
   get gutterspace(){
-    return this._gutterspace;
+    return this.#gutterspace;
   }
   set gutterspace(_){
-    this._gutterspace = _;
+    this.#gutterspace = _;
   }
 
   get data(){
-    return this._data;
+    return this.#data;
   }
   set data(_){
     // create a placeholder for the element
     // this will be further updated with the layout and actual element reference
-    this._data = _.map(x=>{
+    this.#data = _.map(x=>{
       return {
         data : { ...x }
       }
     });
-    // console.log(this._data)
   }
 
   get album_name_height(){
-    return this._album_name_height;
+    return this.#album_name_height;
   }
   set album_name_height(_){
-    this._album_name_height = +_;
+    this.#album_name_height = +_;
   }
 
   get album_height(){
-    return this._album_height;
+    return this.#album_height;
   }
   set album_height(_){
-    this._album_height = +_;
+    this.#album_height = +_;
   }
   
 }
