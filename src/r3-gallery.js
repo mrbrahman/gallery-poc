@@ -99,7 +99,7 @@ class R3Gallery extends HTMLElement {
     let scrollTop = -this.shadowRoot.getElementById('gallery').scrollTop;
     // console.log(`scrollTop ${scrollTop}`)
     
-    // we make the buffers on each side 3 times the size of the screen
+    // we make the buffers on each side 6 times the size of the screen
 
     // bufferTop: px above the top of the viewport
     // bufferBottom: px below the bottom of the viewport
