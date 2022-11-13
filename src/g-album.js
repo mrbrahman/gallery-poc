@@ -1,9 +1,9 @@
 class GAlbum extends HTMLElement {
   
-  #width; #gutterspace; #data; #album_name_height; #album_height; 
+  #width; #paint_layout = false; #gutterspace; #data; #album_name; #album_name_height = 50; #album_height; 
   
   static get observedAttributes() {
-    return ['album_name','width','gutterspace','data','data_src'];
+    return ['paint_layout','album_name','width','gutterspace','data','data_src'];
   }
   
   constructor() {
@@ -17,9 +17,18 @@ class GAlbum extends HTMLElement {
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
     
+    // paint album name
     this.#paintName();
+    
+    // calculate album layout
     this.#doLayout();
-    // painting of layout will selectively happen from the wrapper, so not doing anything here
+
+    // paint album only if paint_layout is set
+    if(this.#paint_layout){
+      this.#paintLayout();
+    } else {
+      // painting of layout will selectively happen from the wrapper, so not doing anything here
+    }
 
     this.shadowRoot.getElementById('container')
       .addEventListener('r3-item-deleted', this.#handleItemDeleted.bind(this), true)
@@ -28,6 +37,9 @@ class GAlbum extends HTMLElement {
   
   attributeChangedCallback(name, oldValue, newValue) {
     switch(name){
+      case 'paint_layout':
+        this.paint_layout = newValue == null ? false : true;
+        break;
       case 'album_name':
         this.album_name = newValue;
         break;
@@ -42,7 +54,6 @@ class GAlbum extends HTMLElement {
         break;
     }
   }
-
 
   disconnectedCallback() {
     this.shadowRoot.getElementById('container')
@@ -63,6 +74,13 @@ class GAlbum extends HTMLElement {
     let lastAlbumHeight = this.album_height;
     // re-calc layout
     this.#doLayout();
+
+    // paint album only if paint_layout is set
+    if(this.#paint_layout){
+      this.#paintLayout();
+    } else {
+      // painting of layout will selectively happen from the wrapper, so not doing anything here
+    }
 
     // if there is any height change resulting from this delete, fire an event, so 
     // the wrapper r3-gallery can paint as needed
@@ -154,31 +172,7 @@ class GAlbum extends HTMLElement {
           (thumbBottom >= bufferTop && thumbBottom <= bufferBottom))
       {
         // album is within the boundaries
-        if(x.elem == undefined){
-          // create element in dom
-          let elem = Object.assign(document.createElement('g-thumb'), {
-            id: x.data.photoid,
-            photoid: x.data.photoid,
-            width: x.layout.width,
-            height: x.layout.height,
-            rating: x.data.rating
-          });
-          elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
-          
-          // keep reference in this.data
-          x.elem = elem;
-          
-          this.shadowRoot.getElementById('container').appendChild(elem);
-
-        } else if (!x.elem.isConnected){
-          // the thumb was removed, but element (class) was found - just append the element back into the DOM
-          this.shadowRoot.getElementById('container').appendChild(x.elem);
-        } else {
-          // just update the new position (for resize / delete events)
-          x.elem.width = x.layout.width;
-          x.elem.height = x.layout.height;
-          x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
-        }
+        this.#paintItem(x);
       } else {
         // album is not within boundaries
 
@@ -192,31 +186,72 @@ class GAlbum extends HTMLElement {
     })
   }
 
+  #paintLayout(){
+    this.data.forEach(x=>{
+      this.#paintItem(x);
+    });
+  }
+
+  #paintItem(x){
+    if(x.elem == undefined){
+      // create element in dom
+      let elem = Object.assign(document.createElement('g-thumb'), {
+        id: x.data.photoid,
+        photoid: x.data.photoid,
+        width: x.layout.width,
+        height: x.layout.height,
+        rating: x.data.rating
+      });
+      elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
+      
+      // keep reference in this.data
+      x.elem = elem;
+      
+      this.shadowRoot.getElementById('container').appendChild(elem);
+
+    } else if (!x.elem.isConnected){
+      // the thumb was removed, but element (class) was found - just append the element back into the DOM
+      this.shadowRoot.getElementById('container').appendChild(x.elem);
+    } else {
+      // just update the new position (for resize / delete events)
+      x.elem.width = x.layout.width;
+      x.elem.height = x.layout.height;
+      x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
+    }
+  }
 
   #paintName(){
     this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
     this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
   }
+
   // boilerplate
+  get paint_layout(){
+    return this.#paint_layout;
+  }
+  set paint_layout(_){
+    this.#paint_layout = _;
+  }
+
   get album_name(){
-    return this._album_name;
+    return this.#album_name;
   }
   set album_name(_){
-    this._album_name = _;
+    this.#album_name = _;
   }
   
   get width(){
     return this.#width;
   }
   set width(_){
-    this.#width = _;
+    this.#width = +_;
   }
 
   get gutterspace(){
     return this.#gutterspace;
   }
   set gutterspace(_){
-    this.#gutterspace = _;
+    this.#gutterspace = +_;
   }
 
   get data(){
