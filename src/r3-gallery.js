@@ -31,10 +31,8 @@ class R3Gallery extends HTMLElement {
       let album = Object.assign(document.createElement('g-album'), {
         id: d.id,
         album_name: d.album,
-        album_name_height: 50,
         data: d.items,
-        width: this.shadowRoot.getElementById('gallery').clientWidth,
-        gutterspace: 4
+        width: this.shadowRoot.getElementById('gallery').clientWidth
       });
     
       return album;
