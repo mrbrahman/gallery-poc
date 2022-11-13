@@ -110,7 +110,7 @@ class GThumb extends HTMLElement {
   }
 
   #slRatingChanged(evt){
-    let r = evt.target.value
+    let r = evt.target.value;
     console.log(`new value: ${r} to be updated in db`);
     this.#rating = r;
 }
