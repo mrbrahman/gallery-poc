@@ -68,7 +68,7 @@ class R3Gallery extends HTMLElement {
   handleAlbumHeightChange() {
     // apply "style: top" changes to all albums
     this.reAssignAlbumPositions();
-    // bring more items to the buffer, if necessary
+    // bring more items to the buffer, or remove items from buffer as necessary
     this.selectivelyPaintAlbums();
   }
 
@@ -173,6 +173,7 @@ class R3Gallery extends HTMLElement {
   reAssignAlbumWidths(){
     this.#albums.forEach(album=>{
       album.width = this.shadowRoot.getElementById('gallery').clientWidth;
+      console.log(`redo layout for ${album.id}`)
       album.redoLayout();
     });
   }
