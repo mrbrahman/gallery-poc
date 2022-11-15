@@ -68,8 +68,8 @@ class GThumb extends HTMLElement {
     
     // console.log('in dicsonnectedCallback');
     this.shadowRoot.querySelector('input[type="checkbox"]').removeEventListener('click', this.#handleSelection);
-    this.shadowRoot.querySelector('sl-rating').removeEventListener('deleted', this.#slRatingChanged);
-    this.shadowRoot.querySelector('sl-icon-button[name="trash"]').removeEventListener('sl-change', this.#itemDeleted);
+    this.shadowRoot.querySelector('sl-rating').removeEventListener('sl-change', this.#slRatingChanged);
+    this.shadowRoot.querySelector('sl-icon-button[name="trash"]').removeEventListener('click', this.#itemDeleted);
   }
   
   #paintRest(){
@@ -95,30 +95,34 @@ class GThumb extends HTMLElement {
     
     // setup event listeners
     this.shadowRoot.querySelector('input[type="checkbox"]')
-      .addEventListener('click', this.#handleSelection.bind(this));
+      .addEventListener('click', this.#handleSelection.bind(this))
+    ;
     
     this.shadowRoot.querySelector('sl-rating')
-      .addEventListener('sl-change', this.#slRatingChanged.bind(this));
+      .addEventListener('sl-change', this.#slRatingChanged)
+    ;
     
     this.shadowRoot.querySelector('sl-icon-button[name="trash"]')
-    .addEventListener('click', this.#itemDeleted.bind(this))
+      .addEventListener('click', this.#itemDeleted)
+    ;
     
   }
 
   #handleSelection(evt){
-    this.#selected = evt.target.checked;
+    this.selected = evt.target.checked; // calls the setter
 
     let checkEvent = new CustomEvent('r3-item-selected', {composed: true});
     this.dispatchEvent(checkEvent);
   }
 
-  #slRatingChanged(evt){
+  #slRatingChanged = ((evt)=>{
     let r = evt.target.value;
     console.log(`new value: ${r} to be updated in db`);
     this.#rating = r;
-}
+  }).bind(this)
+  ;
   
-  #itemDeleted(evt){
+  #itemDeleted = ((evt)=>{
     // TODO: delete item from system (make REST call)
     // console.log('dispatching delete event');
     console.log('Delete from server/db here for photoid '+this.photoid);
@@ -128,7 +132,8 @@ class GThumb extends HTMLElement {
     this.shadowRoot.querySelector('#container').classList.add('removed');
     // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
     setTimeout(()=>{this.remove()}, 300);
-  }
+  }).bind(this)
+  ;
 
 
   
@@ -213,6 +218,32 @@ class GThumb extends HTMLElement {
   }
   set selected(_){
     this.#selected = _;
+
+    // enable/disable rating and delete button
+    this.shadowRoot.querySelector('sl-rating').disabled = _;
+    this.shadowRoot.querySelector('sl-icon-button[name="trash"]').disabled = _;
+    
+    // enable/disable listeners to update individually
+    if(this.#selected){
+      // disable
+      this.shadowRoot.querySelector('sl-rating')
+        .removeEventListener('sl-change', this.#slRatingChanged)
+      ;
+    
+      this.shadowRoot.querySelector('sl-icon-button[name="trash"]')
+        .removeEventListener('click', this.#itemDeleted)
+      ;
+    } else {
+      // enable
+      this.shadowRoot.querySelector('sl-rating')
+        .addEventListener('sl-change', this.#slRatingChanged)
+      ;
+    
+      this.shadowRoot.querySelector('sl-icon-button[name="trash"]')
+        .addEventListener('click', this.#itemDeleted)
+      ;
+    }
+    
     this.#paintSelected();
   }
 

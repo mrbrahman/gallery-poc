@@ -13,11 +13,21 @@ class R3GalleryUpdates extends HTMLElement {
     this.shadowRoot.getElementById("close")
       .addEventListener('click', this.handleClose.bind(this))
     ;
+
+    this.shadowRoot.getElementById("rating")
+      .addEventListener('sl-change', this.handleRatingChanged.bind(this))
+    ;
   }
 
   handleClose(evt){
     let closed = new Event('r3-gallery-updates-closed');
     this.dispatchEvent(closed);
+  }
+
+  handleRatingChanged(evt){
+    let newRating = evt.target.value;
+    let ratingChanged = new CustomEvent('r3-gallery-updates-rating-changed', {detail: {newRating}});
+    this.dispatchEvent(ratingChanged);
   }
 
   disconnectedCallback() {

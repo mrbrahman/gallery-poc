@@ -53,6 +53,10 @@ class R3Gallery extends HTMLElement {
     this.shadowRoot.getElementById('gallery')
       .addEventListener('r3-gallery-updates-closed', this.handleGalleryUpdatesClosed.bind(this), true)
     ;
+
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('r3-gallery-updates-rating-changed', this.handleGalleryUpdatesRatingChanged.bind(this), true)
+    ;
     
     this.shadowRoot.getElementById('gallery')
       .addEventListener('scroll', this.throttleHandleScroll)
@@ -108,6 +112,8 @@ class R3Gallery extends HTMLElement {
       x.selected = false;
     });
 
+    this.#itemsSelected = [];
+
     this.shadowRoot.querySelector('r3-gallery-updates').ctr = 0;
     this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
     
@@ -115,6 +121,15 @@ class R3Gallery extends HTMLElement {
     setTimeout(function(){
       this.shadowRoot.querySelector('r3-gallery-updates').remove();
     }.bind(this), 400);
+  }
+
+  handleGalleryUpdatesRatingChanged(evt){
+    console.log('mass update in DB and files exif');
+
+    this.#itemsSelected.forEach(x=>{
+      x.rating = evt.detail.newRating;
+    });
+
   }
 
   reAssignAlbumPositions(){
