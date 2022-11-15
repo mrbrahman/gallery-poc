@@ -11,27 +11,33 @@ class R3GalleryUpdates extends HTMLElement {
     );
 
     this.shadowRoot.getElementById("close")
-      .addEventListener('click', this.handleClose.bind(this))
+      .addEventListener('click', this.#handleClose)
     ;
 
     this.shadowRoot.getElementById("rating")
-      .addEventListener('sl-change', this.handleRatingChanged.bind(this))
+      .addEventListener('sl-change', this.#handleRatingChanged)
     ;
   }
 
-  handleClose(evt){
+  #handleClose = (evt)=>{
     let closed = new Event('r3-gallery-updates-closed');
     this.dispatchEvent(closed);
   }
 
-  handleRatingChanged(evt){
+  #handleRatingChanged = (evt)=>{
     let newRating = evt.target.value;
     let ratingChanged = new CustomEvent('r3-gallery-updates-rating-changed', {detail: {newRating}});
     this.dispatchEvent(ratingChanged);
   }
 
   disconnectedCallback() {
-    //implementation
+    this.shadowRoot.getElementById("close")
+      .removeEventListener('click', this.#handleClose)
+    ;
+
+    this.shadowRoot.getElementById("rating")
+      .removeEventListener('sl-change', this.#handleRatingChanged)
+    ;
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
