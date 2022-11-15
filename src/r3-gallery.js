@@ -11,9 +11,9 @@ import {debounce, throttle} from './utils.mjs';
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  #albums = []; #albumsInBuffer = {};
+  #albums = []; #albumsInBuffer = {}; #itemsSelected = [];
   // variables that can be get/set
-  _data;
+  #data;
 
   constructor() {
     // console.log('in constructor')
@@ -45,6 +45,14 @@ class R3Gallery extends HTMLElement {
     this.shadowRoot.getElementById('gallery')
       .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true)
     ;
+
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('r3-item-selected', this.handleItemSelected.bind(this), true)
+    ;
+
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('r3-gallery-updates-closed', this.handleGalleryUpdatesClosed.bind(this), true)
+    ;
     
     this.shadowRoot.getElementById('gallery')
       .addEventListener('scroll', this.throttleHandleScroll)
@@ -53,6 +61,60 @@ class R3Gallery extends HTMLElement {
     window
       .addEventListener('resize', this.throttleHandleResize)
     ;
+  }
+
+  handleItemSelected(evt){
+    let item = evt.path[0];
+
+    if(item.selected){
+      this.#itemsSelected.push(item);
+    } else {
+      let idx = this.#itemsSelected.findIndex((x)=>x.id==item.id)
+      this.#itemsSelected.splice(idx, 1);
+    }
+
+    if(this.#itemsSelected.length > 0){
+      if(!this.shadowRoot.querySelector('r3-gallery-updates')){
+        let u = document.createElement('r3-gallery-updates');
+        this.shadowRoot.getElementById('gallery').append(u);
+        u.ctr = 1;
+
+        u.style.top = this.parentNode.clientHeight + 'px';
+        
+        // this is to enable the transition effect. TODO: Is there a better way?
+        setTimeout(function(){
+          u.style.top = this.parentNode.clientHeight - 65 + 'px';
+
+        }.bind(this), 10);
+      } else {
+        this.shadowRoot.querySelector('r3-gallery-updates').ctr = this.#itemsSelected.length;
+      }
+      
+
+    } else if(this.#itemsSelected.length == 0){
+      this.shadowRoot.querySelector('r3-gallery-updates').ctr = 0;
+      this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
+      
+      // TODO: use a listener to wait for CSS transition to complete
+      setTimeout(function(){
+        this.shadowRoot.querySelector('r3-gallery-updates').remove();
+      }.bind(this), 400);
+    }
+
+  }
+
+  handleGalleryUpdatesClosed(){
+    this.#itemsSelected.forEach(x=>{
+      x.selected = false;
+    });
+
+    this.shadowRoot.querySelector('r3-gallery-updates').ctr = 0;
+    this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
+    
+    // TODO: use a listener to wait for CSS transition to complete
+    setTimeout(function(){
+      this.shadowRoot.querySelector('r3-gallery-updates').remove();
+    }.bind(this), 400);
   }
 
   reAssignAlbumPositions(){
@@ -173,7 +235,6 @@ class R3Gallery extends HTMLElement {
   reAssignAlbumWidths(){
     this.#albums.forEach(album=>{
       album.width = this.shadowRoot.getElementById('gallery').clientWidth;
-      console.log(`redo layout for ${album.id}`)
       album.redoLayout();
     });
   }
@@ -204,10 +265,10 @@ class R3Gallery extends HTMLElement {
   }
 
   get data(){
-    return this._data;
+    return this.#data;
   }
   set data(_){
-    this._data = _;
+    this.#data = _;
   }
 
   get data_src(){
@@ -215,7 +276,7 @@ class R3Gallery extends HTMLElement {
   }
   set data_src(_){
     this._data_src = _;
-    // do a fetch and set this._data
+    // do a fetch and set this.#data
   }
 
 }

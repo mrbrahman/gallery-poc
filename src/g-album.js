@@ -104,7 +104,7 @@ class GAlbum extends HTMLElement {
   
   #doLayout(){
     // console.log('in #doLayout');
-    console.log('width: '+this.clientWidth)
+    // console.log('width: '+this.clientWidth)
     // console.log('width: '+this.#width)
     let minAspectRatio = this.#getMinAspectRatio(), row = [], rowAspectRatio = 0, 
       trX = 0, trY = this.album_name_height;

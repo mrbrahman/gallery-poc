@@ -1,6 +1,6 @@
 class GThumb extends HTMLElement {
   // instance variables
-  #photoid; #width; #height; #rating; #selected;
+  #photoid; #width; #height; #rating=0; #selected=false;
   
   #dppx = parseFloat(window.devicePixelRatio.toFixed(2));
   
@@ -107,6 +107,9 @@ class GThumb extends HTMLElement {
 
   #handleSelection(evt){
     this.#selected = evt.target.checked;
+
+    let checkEvent = new CustomEvent('r3-item-selected', {composed: true});
+    this.dispatchEvent(checkEvent);
   }
 
   #slRatingChanged(evt){
@@ -167,7 +170,7 @@ class GThumb extends HTMLElement {
     }
   }
   #paintSelected(){
-    if(this.inisConnected){
+    if(this.isConnected){
       this.shadowRoot.querySelector('input[type="checkbox"]').checked = this.selected;
     }
   }
@@ -209,7 +212,7 @@ class GThumb extends HTMLElement {
     return this.#selected;
   }
   set selected(_){
-    this.#selected = _
+    this.#selected = _;
     this.#paintSelected();
   }
 

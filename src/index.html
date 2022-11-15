@@ -51,7 +51,6 @@
         }
         to {
           filter: blur(0);
-          opacity: 1;
         }
       }
       
@@ -170,9 +169,77 @@
         position: absolute;
         transition: top 0.4s;
       }
+
+      r3-gallery-updates {
+        /* top: 100svh; */
+        /* top: 100vh; */
+        position: sticky;
+        left: 0px;
+        width: 100%;
+        transition: top 0.4s;
+      }
+
     </style>
     <div id="gallery">
 
+    </div>
+  </template>
+
+  <template id="R3-GALLERY-UPDATES">
+    <style>
+      #container {
+        display: grid;
+        height: 65px;
+        grid-template-rows: 1fr;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        box-shadow: 0 0 5px #333;
+        background-color: white;
+      }
+
+      .col {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+      }
+      #col1 {
+        justify-content: flex-start;
+      }
+      #col2 {
+        justify-content: flex-end;
+      }
+      #col1 > * {
+        padding-left: 10px;
+      }
+      #col2 > * {
+        padding-right: 10px;
+      }
+
+      sl-rating {
+        --symbol-size: 1.25rem;
+      }
+
+      sl-icon-button {
+        font-size: 1.25rem;
+      }
+      
+    </style>
+
+    <div id="container">
+      <div class="col" id="col1">
+        <sl-icon-button name="x-lg" id="close"></sl-icon-button>
+        <div id="ctr"></div>
+      </div>
+      
+      <div class="col" id="col2">
+        <sl-rating></sl-rating>
+        <sl-icon-button name="tags-fill">Keywords</sl-icon-button>
+        <sl-icon-button name="trash-fill">Delete</sl-icon-button>
+        <sl-icon-button name="file-code-fill">Organize</sl-icon-button> <!-- this will be dropdown -->
+        <sl-icon-button name="download">Download</sl-icon-button>
+        <!-- do I need the 3 dots for additional stuff? -->
+        <!-- <sl-icon-button name="three-dots-vertical">More Options</sl-icon-button> -->
+      </div>
     </div>
   </template>
 
@@ -260,7 +327,7 @@
 
     let data = await Promise.all(dataPromises);
 
-    console.log(data);
+    // console.log(data);
 
     let gallery = Object.assign(document.createElement('r3-gallery'), { data });
     let c = document.getElementById('main-content');
