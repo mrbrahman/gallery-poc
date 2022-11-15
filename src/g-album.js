@@ -31,7 +31,7 @@ class GAlbum extends HTMLElement {
     }
 
     this.shadowRoot.getElementById('container')
-      .addEventListener('r3-item-deleted', this.#handleItemDeleted.bind(this), true)
+      .addEventListener('r3-item-deleted', this.#handleItemDeleted, true)
     ;
   }
   
@@ -61,7 +61,7 @@ class GAlbum extends HTMLElement {
     ;
   }
 
-  #handleItemDeleted(evt){
+  #handleItemDeleted = (evt)=>{
     // if an item from this album is deleted, 
     // 1. remove references to the item,
     // 2. recompute album layout, 
