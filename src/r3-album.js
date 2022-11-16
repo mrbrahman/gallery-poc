@@ -195,7 +195,7 @@ class R3Album extends HTMLElement {
   #paintItem(x){
     if(x.elem == undefined){
       // create element in dom
-      let elem = Object.assign(document.createElement('g-thumb'), {
+      let elem = Object.assign(document.createElement('r3-thumb'), {
         id: x.data.photoid,
         photoid: x.data.photoid,
         width: x.layout.width,

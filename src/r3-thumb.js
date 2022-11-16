@@ -1,4 +1,4 @@
-class GThumb extends HTMLElement {
+class R3Thumb extends HTMLElement {
   // instance variables
   #photoid; #width; #height; #rating=0; #selected=false;
   
@@ -250,4 +250,4 @@ class GThumb extends HTMLElement {
 
 }
 
-customElements.define('g-thumb', GThumb);
+customElements.define('r3-thumb', R3Thumb);
