@@ -39,36 +39,36 @@ class R3Gallery extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('gallery').append(...this.#albums);
-    this.reAssignAlbumPositions();
-    this.selectivelyPaintAlbums();
+    this.#reAssignAlbumPositions();
+    this.#selectivelyPaintAlbums();
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-album-height-changed', this.handleAlbumHeightChange.bind(this), true)
+      .addEventListener('r3-album-height-changed', this.#handleAlbumHeightChange, true)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-item-selected', this.handleItemSelected.bind(this), true)
+      .addEventListener('r3-item-selected', this.#handleItemSelected, true)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-closed', this.handleGalleryUpdatesClosed.bind(this), true)
+      .addEventListener('r3-gallery-updates-closed', this.#handleGalleryUpdatesClosed, true)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-rating-changed', this.handleGalleryUpdatesRatingChanged.bind(this), true)
+      .addEventListener('r3-gallery-updates-rating-changed', this.#handleGalleryUpdatesRatingChanged, true)
     ;
     
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('scroll', this.throttleHandleScroll)
+      .addEventListener('scroll', this.#throttleHandleScroll)
     ;
     
     window
-      .addEventListener('resize', this.throttleHandleResize)
+      .addEventListener('resize', this.#throttleHandleResize)
     ;
   }
 
-  handleItemSelected(evt){
-    let item = evt.path[0];
+  #handleItemSelected = (evt)=>{
+    let item = evt.composedPath()[0];
 
     if(item.selected){
       this.#itemsSelected.push(item);
@@ -86,10 +86,9 @@ class R3Gallery extends HTMLElement {
         u.style.top = this.parentNode.clientHeight + 'px';
         
         // this is to enable the transition effect. TODO: Is there a better way?
-        setTimeout(function(){
-          u.style.top = this.parentNode.clientHeight - 65 + 'px';
-
-        }.bind(this), 10);
+        setTimeout(()=>{
+          u.style.top = '150px'; //this.parentNode.clientHeight - 65 + 'px';
+        });
       } else {
         this.shadowRoot.querySelector('r3-gallery-updates').ctr = this.#itemsSelected.length;
       }
@@ -100,14 +99,14 @@ class R3Gallery extends HTMLElement {
       this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
       
       // TODO: use a listener to wait for CSS transition to complete
-      setTimeout(function(){
+      setTimeout(()=>{
         this.shadowRoot.querySelector('r3-gallery-updates').remove();
-      }.bind(this), 400);
+      }, 400);
     }
 
   }
 
-  handleGalleryUpdatesClosed(){
+  #handleGalleryUpdatesClosed = ()=>{
     this.#itemsSelected.forEach(x=>{
       x.selected = false;
     });
@@ -118,12 +117,12 @@ class R3Gallery extends HTMLElement {
     this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
     
     // TODO: use a listener to wait for CSS transition to complete
-    setTimeout(function(){
+    setTimeout(()=>{
       this.shadowRoot.querySelector('r3-gallery-updates').remove();
-    }.bind(this), 400);
+    }, 400);
   }
 
-  handleGalleryUpdatesRatingChanged(evt){
+  #handleGalleryUpdatesRatingChanged = (evt)=>{
     console.log('mass update in DB and files exif');
 
     this.#itemsSelected.forEach(x=>{
@@ -132,7 +131,7 @@ class R3Gallery extends HTMLElement {
 
   }
 
-  reAssignAlbumPositions(){
+  #reAssignAlbumPositions(){
     let cumHeight = 0;
     this.#albums.forEach(album=>{
       album.style.top = cumHeight+'px';
@@ -142,14 +141,14 @@ class R3Gallery extends HTMLElement {
     });
   }
   
-  handleAlbumHeightChange() {
+  #handleAlbumHeightChange = () => {
     // apply "style: top" changes to all albums
-    this.reAssignAlbumPositions();
+    this.#reAssignAlbumPositions();
     // bring more items to the buffer, or remove items from buffer as necessary
-    this.selectivelyPaintAlbums();
+    this.#selectivelyPaintAlbums();
   }
 
-  selectivelyPaintAlbums(forceRepaint = true) {
+  #selectivelyPaintAlbums(forceRepaint = true) {
     
     //   --------------------------------------- bufferTop (-ve value)
     //
@@ -238,36 +237,36 @@ class R3Gallery extends HTMLElement {
     console.log(this.#albumsInBuffer)
   }
 
-  throttleHandleScroll = throttle(()=>this.selectivelyPaintAlbums(false), 100);
+  #throttleHandleScroll = throttle(()=>this.#selectivelyPaintAlbums(false), 100);
 
-  handleResize() {
+  #handleResize() {
     // apply the new width to all albums
-    this.reAssignAlbumWidths();
+    this.#reAssignAlbumWidths();
     // re-assign album positions, and selectively paint
-    this.handleAlbumHeightChange();
+    this.#handleAlbumHeightChange();
   }
   
-  reAssignAlbumWidths(){
+  #reAssignAlbumWidths(){
     this.#albums.forEach(album=>{
       album.width = this.shadowRoot.getElementById('gallery').clientWidth;
       album.redoLayout();
     });
   }
 
-  //debounceHandleResize = debounce(()=>this.handleResize(), 300);
-  throttleHandleResize = throttle(()=>this.handleResize(), 100);
+  //debounceHandleResize = debounce(()=>this.#handleResize(), 300);
+  #throttleHandleResize = throttle(()=>this.#handleResize(), 100);
 
   disconnectedCallback() {
     this.shadowRoot.getElementById('gallery')
-      .removeEventListener('r3-album-height-changed', this.handleAlbumHeightChange)
+      .removeEventListener('r3-album-height-changed', this.#handleAlbumHeightChange)
     ;
   
     this.shadowRoot.getElementById('gallery')
-      .removeEventListener('scroll', this.throttleHandleScroll)
+      .removeEventListener('scroll', this.#throttleHandleScroll)
     ;
     
     window
-      .removeEventListener('resize', this.throttleHandleResize)
+      .removeEventListener('resize', this.#throttleHandleResize)
     ;
   }
 
