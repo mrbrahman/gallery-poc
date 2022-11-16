@@ -2,7 +2,7 @@
 
 
 
-// <g-album name='Album 1' width=1000 gutterspace=4 data="[{photoid: 1, ar:1}, {photoid:2, ar: 1.33}, {photoid:5, ar:0.82}]"></g-album>
+// <r3-album name='Album 1' width=1000 gutterspace=4 data="[{photoid: 1, ar:1}, {photoid:2, ar: 1.33}, {photoid:5, ar:0.82}]"></r3-album>
 
 // data or data_src are okay
 
@@ -28,7 +28,7 @@ class R3Gallery extends HTMLElement {
 
     this.#albums = this.data.map(d=>{
 
-      let album = Object.assign(document.createElement('g-album'), {
+      let album = Object.assign(document.createElement('r3-album'), {
         id: d.id,
         album_name: d.album,
         data: d.items,

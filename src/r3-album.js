@@ -1,4 +1,4 @@
-class GAlbum extends HTMLElement {
+class R3Album extends HTMLElement {
   
   #width; #paint_layout = false; #gutterspace = 4; #data; #album_name; #album_name_height = 50; #album_height; 
   
@@ -283,5 +283,5 @@ class GAlbum extends HTMLElement {
   
 }
 
-customElements.define('g-album', GAlbum);
+customElements.define('r3-album', R3Album);
 
