@@ -51,11 +51,11 @@ class R3Gallery extends HTMLElement {
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-closed', this.#handleGalleryUpdatesClosed)
+      .addEventListener('r3-gallery-controls-closed', this.#handleGalleryUpdatesClosed)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-rating-changed', this.#handleGalleryUpdatesRatingChanged)
+      .addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryUpdatesRatingChanged)
     ;
     
     this.shadowRoot.getElementById('gallery')
@@ -78,8 +78,8 @@ class R3Gallery extends HTMLElement {
     }
 
     if(this.#itemsSelected.length > 0){
-      if(!this.shadowRoot.querySelector('r3-gallery-updates')){
-        let u = document.createElement('r3-gallery-updates');
+      if(!this.shadowRoot.querySelector('r3-gallery-controls')){
+        let u = document.createElement('r3-gallery-controls');
         this.shadowRoot.getElementById('gallery').append(u);
         u.ctr = 1;
 
@@ -90,17 +90,17 @@ class R3Gallery extends HTMLElement {
           u.style.top = '150px'; //this.parentNode.clientHeight - 65 + 'px';
         });
       } else {
-        this.shadowRoot.querySelector('r3-gallery-updates').ctr = this.#itemsSelected.length;
+        this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelected.length;
       }
       
 
     } else if(this.#itemsSelected.length == 0){
-      this.shadowRoot.querySelector('r3-gallery-updates').ctr = 0;
-      this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
+      this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
+      this.shadowRoot.querySelector('r3-gallery-controls').style.top = this.parentNode.clientHeight + 'px';
       
       // TODO: use a listener to wait for CSS transition to complete
       setTimeout(()=>{
-        this.shadowRoot.querySelector('r3-gallery-updates').remove();
+        this.shadowRoot.querySelector('r3-gallery-controls').remove();
       }, 400);
     }
 
@@ -113,12 +113,12 @@ class R3Gallery extends HTMLElement {
 
     this.#itemsSelected = [];
 
-    this.shadowRoot.querySelector('r3-gallery-updates').ctr = 0;
-    this.shadowRoot.querySelector('r3-gallery-updates').style.top = this.parentNode.clientHeight + 'px';
+    this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
+    this.shadowRoot.querySelector('r3-gallery-controls').style.top = this.parentNode.clientHeight + 'px';
     
     // TODO: use a listener to wait for CSS transition to complete
     setTimeout(()=>{
-      this.shadowRoot.querySelector('r3-gallery-updates').remove();
+      this.shadowRoot.querySelector('r3-gallery-controls').remove();
     }, 400);
   }
 

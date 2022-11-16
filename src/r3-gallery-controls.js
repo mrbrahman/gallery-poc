@@ -1,4 +1,4 @@
-class R3GalleryUpdates extends HTMLElement {
+class R3GalleryControls extends HTMLElement {
   #ctr; 
 
   constructor() {
@@ -20,13 +20,13 @@ class R3GalleryUpdates extends HTMLElement {
   }
 
   #handleClose = (evt)=>{
-    let closed = new Event('r3-gallery-updates-closed', {composed: true, bubbles: true});
+    let closed = new Event('r3-gallery-controls-closed', {composed: true, bubbles: true});
     this.dispatchEvent(closed);
   }
 
   #handleRatingChanged = (evt)=>{
     let newRating = evt.target.value;
-    let ratingChanged = new CustomEvent('r3-gallery-updates-rating-changed', {
+    let ratingChanged = new CustomEvent('r3-gallery-controls-rating-changed', {
       composed: true, 
       bubbles: true,
       detail: {newRating}
@@ -68,4 +68,4 @@ class R3GalleryUpdates extends HTMLElement {
 
 }
 
-window.customElements.define('r3-gallery-updates', R3GalleryUpdates);
+window.customElements.define('r3-gallery-controls', R3GalleryControls);
