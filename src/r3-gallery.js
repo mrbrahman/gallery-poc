@@ -47,15 +47,15 @@ class R3Gallery extends HTMLElement {
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-item-selected', this.#handleItemSelected, true)
+      .addEventListener('r3-item-selected', this.#handleItemSelected)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-closed', this.#handleGalleryUpdatesClosed, true)
+      .addEventListener('r3-gallery-updates-closed', this.#handleGalleryUpdatesClosed)
     ;
 
     this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-updates-rating-changed', this.#handleGalleryUpdatesRatingChanged, true)
+      .addEventListener('r3-gallery-updates-rating-changed', this.#handleGalleryUpdatesRatingChanged)
     ;
     
     this.shadowRoot.getElementById('gallery')

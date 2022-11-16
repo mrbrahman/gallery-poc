@@ -20,13 +20,17 @@ class R3GalleryUpdates extends HTMLElement {
   }
 
   #handleClose = (evt)=>{
-    let closed = new Event('r3-gallery-updates-closed');
+    let closed = new Event('r3-gallery-updates-closed', {composed: true, bubbles: true});
     this.dispatchEvent(closed);
   }
 
   #handleRatingChanged = (evt)=>{
     let newRating = evt.target.value;
-    let ratingChanged = new CustomEvent('r3-gallery-updates-rating-changed', {detail: {newRating}});
+    let ratingChanged = new CustomEvent('r3-gallery-updates-rating-changed', {
+      composed: true, 
+      bubbles: true,
+      detail: {newRating}
+    });
     this.dispatchEvent(ratingChanged);
   }
 

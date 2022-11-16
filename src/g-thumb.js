@@ -111,7 +111,7 @@ class GThumb extends HTMLElement {
   #handleSelection = (evt)=>{
     this.selected = evt.target.checked; // calls the setter
 
-    let checkEvent = new CustomEvent('r3-item-selected', {composed: true});
+    let checkEvent = new CustomEvent('r3-item-selected', {composed: true, bubbles: true});
     this.dispatchEvent(checkEvent);
   }
 
