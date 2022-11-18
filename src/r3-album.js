@@ -62,32 +62,47 @@ class R3Album extends HTMLElement {
   }
 
   #handleItemDeleted = (evt)=>{
+    let deletedItem = evt.target;
+
     // if an item from this album is deleted, 
     // 1. remove references to the item,
     // 2. recompute album layout, 
     // 3. and if height has changed, dispatch an event
 
-    // remove element from the list
-    let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
-    this.data.splice(removedElementIndex, 1);
+    deletedItem.style.transform += " scale(0)";
+    // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
+    setTimeout(()=>{
+      // remove the item from DOM (with a transition)
+      deletedItem.remove();
 
-    let lastAlbumHeight = this.album_height;
-    // re-calc layout
-    this.#doLayout();
+      // remove element from the list
+      let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+      this.data.splice(removedElementIndex, 1);
 
-    // paint album only if paint_layout is set
-    if(this.#paint_layout){
-      this.#paintLayout();
-    } else {
-      // painting of layout will selectively happen from the wrapper, so not doing anything here
-    }
+      let lastAlbumHeight = this.album_height;
+      // re-calc layout
+      this.#doLayout();
+  
+      // paint album only if paint_layout is set
+      if(this.#paint_layout){
+        this.#paintLayout();
+      } else {
+        // painting of layout will selectively happen from the wrapper, so not doing anything here
+      }
+  
+      // if there is any height change resulting from this delete, fire an event, so 
+      // the wrapper r3-gallery can paint as needed
+      if(lastAlbumHeight != this.album_height){
+        let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+        this.dispatchEvent(albumHeightChangeEvent);
+      }
+    }, 100);
 
-    // if there is any height change resulting from this delete, fire an event, so 
-    // the wrapper r3-gallery can paint as needed
-    if(lastAlbumHeight != this.album_height){
-      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
-      this.dispatchEvent(albumHeightChangeEvent);
-    }
+
+
+  }
+
+  deleteSelectedItems(){
 
   }
   

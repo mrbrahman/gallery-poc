@@ -128,9 +128,6 @@ class R3Thumb extends HTMLElement {
 
     const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: this.photoid} });
     this.dispatchEvent(deleteEvent);
-    this.shadowRoot.querySelector('#container').classList.add('removed');
-    // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
-    setTimeout(()=>{this.remove()}, 300);
   }
 
 
