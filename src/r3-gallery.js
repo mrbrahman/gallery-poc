@@ -81,14 +81,8 @@ class R3Gallery extends HTMLElement {
       if(!this.shadowRoot.querySelector('r3-gallery-controls')){
         let u = document.createElement('r3-gallery-controls');
         this.shadowRoot.getElementById('gallery').append(u);
-        u.ctr = 1;
+        u.ctr = this.#itemsSelected.length;
 
-        u.style.top = this.parentNode.clientHeight + 'px';
-        
-        // this is to enable the transition effect. TODO: Is there a better way?
-        setTimeout(()=>{
-          u.style.top = '150px'; //this.parentNode.clientHeight - 65 + 'px';
-        });
       } else {
         this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelected.length;
       }
@@ -96,12 +90,7 @@ class R3Gallery extends HTMLElement {
 
     } else if(this.#itemsSelected.length == 0){
       this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
-      this.shadowRoot.querySelector('r3-gallery-controls').style.top = this.parentNode.clientHeight + 'px';
-      
-      // TODO: use a listener to wait for CSS transition to complete
-      setTimeout(()=>{
-        this.shadowRoot.querySelector('r3-gallery-controls').remove();
-      }, 400);
+      this.shadowRoot.querySelector('r3-gallery-controls').remove();
     }
 
   }
@@ -117,9 +106,9 @@ class R3Gallery extends HTMLElement {
     this.shadowRoot.querySelector('r3-gallery-controls').style.top = this.parentNode.clientHeight + 'px';
     
     // TODO: use a listener to wait for CSS transition to complete
-    setTimeout(()=>{
+    // setTimeout(()=>{
       this.shadowRoot.querySelector('r3-gallery-controls').remove();
-    }, 400);
+    // }, 400);
   }
 
   #handleGalleryUpdatesRatingChanged = (evt)=>{
