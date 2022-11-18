@@ -68,6 +68,14 @@ class R3Gallery extends HTMLElement {
   }
 
   #handleItemSelected = (evt)=>{
+    // Even though the event is fired from r3-thumb, evt.target is set to r3-album
+    // That's because: for shadow components, browser thinks the parent knows only about the
+    // children it created, not any other components that the children might have created.
+    // See: https://javascript.info/shadow-dom-events for more details.
+    // In our case however, as developer I have full knowledge of all components :-) so we
+    // make use of the actual target
+
+    // Use the first element of composedPath() to identify the event firing r3-thumb
     let item = evt.composedPath()[0];
 
     if(item.selected){
@@ -79,18 +87,19 @@ class R3Gallery extends HTMLElement {
 
     if(this.#itemsSelected.length > 0){
       if(!this.shadowRoot.querySelector('r3-gallery-controls')){
-        let u = document.createElement('r3-gallery-controls');
-        this.shadowRoot.getElementById('gallery').append(u);
-        u.ctr = this.#itemsSelected.length;
+        let c = document.createElement('r3-gallery-controls');
+        this.shadowRoot.getElementById('gallery').append(c);
+        c.ctr = this.#itemsSelected.length;
 
       } else {
         this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelected.length;
       }
       
-
     } else if(this.#itemsSelected.length == 0){
-      this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
-      this.shadowRoot.querySelector('r3-gallery-controls').remove();
+      // even though we won't need to reset the #itemsSelected array etc, just call the function so 
+      // the logic is in one place
+
+      this.#handleGalleryUpdatesClosed();
     }
 
   }
@@ -103,12 +112,7 @@ class R3Gallery extends HTMLElement {
     this.#itemsSelected = [];
 
     this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
-    this.shadowRoot.querySelector('r3-gallery-controls').style.top = this.parentNode.clientHeight + 'px';
-    
-    // TODO: use a listener to wait for CSS transition to complete
-    // setTimeout(()=>{
-      this.shadowRoot.querySelector('r3-gallery-controls').remove();
-    // }, 400);
+    this.shadowRoot.querySelector('r3-gallery-controls').remove();
   }
 
   #handleGalleryUpdatesRatingChanged = (evt)=>{
