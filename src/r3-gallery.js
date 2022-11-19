@@ -46,11 +46,11 @@ class R3Gallery extends HTMLElement {
 
     this.addEventListener('r3-item-selected', this.#handleItemSelected);
 
-    this.addEventListener('r3-gallery-controls-closed', this.#handleGalleryUpdatesClosed);
+    this.addEventListener('r3-gallery-controls-closed', this.#handleGalleryControlsClosed);
 
-    this.addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryUpdatesRatingChanged);
+    this.addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryControlsRatingChanged);
     
-    this.addEventListener('r3-gallery-events-delete-pressed', this.#handleGalleryUpdatesDeletePressed);
+    this.addEventListener('r3-gallery-events-delete-pressed', this.#handleGalleryControlsDeletePressed);
 
     this.shadowRoot.getElementById('gallery')
       .addEventListener('scroll', this.#throttleHandleScroll)
@@ -97,12 +97,12 @@ class R3Gallery extends HTMLElement {
       // even though we won't need to reset the #itemsSelected array etc, just call the function so 
       // the logic is in one place
 
-      this.#handleGalleryUpdatesClosed();
+      this.#handleGalleryControlsClosed();
     }
 
   }
 
-  #handleGalleryUpdatesClosed = ()=>{
+  #handleGalleryControlsClosed = ()=>{
     this.#itemsSelected.forEach(x=>{
       x.selected = false;
     });
@@ -119,7 +119,7 @@ class R3Gallery extends HTMLElement {
     }, 400);
   }
 
-  #handleGalleryUpdatesRatingChanged = (evt)=>{
+  #handleGalleryControlsRatingChanged = (evt)=>{
     console.log('mass update in DB and files exif');
 
     this.#itemsSelected.forEach(x=>{
@@ -128,13 +128,13 @@ class R3Gallery extends HTMLElement {
 
   }
 
-  #handleGalleryUpdatesDeletePressed = (evt)=>{
+  #handleGalleryControlsDeletePressed = (evt)=>{
     console.log('in delete pressed');
     this.#albums.forEach(album=>album.deleteSelectedItems());
 
     // since the selected items are deleted, there is no need to keep the controls open
     // as there are no more items selected
-    this.#handleGalleryUpdatesClosed();
+    this.#handleGalleryControlsClosed();
   }
 
   #reAssignAlbumPositions(){
