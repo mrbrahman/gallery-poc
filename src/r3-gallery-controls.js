@@ -17,6 +17,9 @@ class R3GalleryControls extends HTMLElement {
     this.shadowRoot.getElementById("rating")
       .addEventListener('sl-change', this.#handleRatingChanged)
     ;
+
+    this.shadowRoot.getElementById("delete")
+      .addEventListener('click', this.#handleDelete)
   }
 
   #handleClose = (evt)=>{
@@ -32,6 +35,11 @@ class R3GalleryControls extends HTMLElement {
       detail: {newRating}
     });
     this.dispatchEvent(ratingChanged);
+  }
+
+  #handleDelete = (evt)=>{
+    let deleted = new Event('r3-gallery-events-delete-pressed', {composed: true, bubbles: true});
+    this.dispatchEvent(deleted);
   }
 
   disconnectedCallback() {

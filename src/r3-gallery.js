@@ -56,8 +56,12 @@ class R3Gallery extends HTMLElement {
 
     this.shadowRoot.getElementById('gallery')
       .addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryUpdatesRatingChanged)
-    ;
+    ;    
     
+    this.shadowRoot.getElementById('gallery')
+      .addEventListener('r3-gallery-events-delete-pressed', this.#handleGalleryUpdatesDeletePressed)
+    ;
+
     this.shadowRoot.getElementById('gallery')
       .addEventListener('scroll', this.#throttleHandleScroll)
     ;
@@ -124,6 +128,15 @@ class R3Gallery extends HTMLElement {
 
   }
 
+  #handleGalleryUpdatesDeletePressed = (evt)=>{
+    console.log('in delete pressed');
+    this.#albums.forEach(album=>album.deleteSelectedItems());
+
+    // since the selected items are deleted, there is no need to keep the controls open
+    // as there are no more items selected
+    this.#handleGalleryUpdatesClosed();
+  }
+
   #reAssignAlbumPositions(){
     let cumHeight = 0;
     this.#albums.forEach(album=>{
@@ -135,6 +148,7 @@ class R3Gallery extends HTMLElement {
   }
   
   #handleAlbumHeightChange = () => {
+    // console.log('in handleAlbumHeightChange')
     // apply "style: top" changes to all albums
     this.#reAssignAlbumPositions();
     // bring more items to the buffer, or remove items from buffer as necessary

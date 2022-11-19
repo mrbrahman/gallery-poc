@@ -63,47 +63,66 @@ class R3Album extends HTMLElement {
 
   #handleItemDeleted = (evt)=>{
     let deletedItem = evt.target;
-
+    this.#deleteItem(deletedItem, true);
+    
+  }
+  
+  #deleteItem(item, doLayoutChanges=false){
     // if an item from this album is deleted, 
     // 1. remove references to the item,
     // 2. recompute album layout, 
     // 3. and if height has changed, dispatch an event
-
-    deletedItem.style.transform += " scale(0)";
+    
+    item.style.transform += " scale(0)";
     // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
     setTimeout(()=>{
       // remove the item from DOM (with a transition)
-      deletedItem.remove();
-
+      item.remove();
+  
       // remove element from the list
-      let removedElementIndex = this.data.findIndex((x)=>x.elem.id==evt.detail.photoid)
+      let removedElementIndex = this.data.findIndex((x)=>x.elem.id==item.photoid)
       this.data.splice(removedElementIndex, 1);
-
-      let lastAlbumHeight = this.album_height;
-      // re-calc layout
-      this.#doLayout();
-  
-      // paint album only if paint_layout is set
-      if(this.#paint_layout){
-        this.#paintLayout();
-      } else {
-        // painting of layout will selectively happen from the wrapper, so not doing anything here
-      }
-  
-      // if there is any height change resulting from this delete, fire an event, so 
-      // the wrapper r3-gallery can paint as needed
-      if(lastAlbumHeight != this.album_height){
-        let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
-        this.dispatchEvent(albumHeightChangeEvent);
+      
+      if(doLayoutChanges){
+        this.#performLayoutChangesIfNeeded();
       }
     }, 100);
+    
+  }
 
+  #performLayoutChangesIfNeeded(){
+    let lastAlbumHeight = this.album_height;
+    // re-calc layout
+    this.#doLayout();
 
+    // paint album only if paint_layout is set
+    if(this.#paint_layout){
+      this.#paintLayout();
+    } else {
+      // painting of layout will selectively happen from the wrapper, so not doing anything here
+    }
 
+    // if there is any height change resulting from this delete, fire an event, so 
+    // the wrapper r3-gallery can paint as needed
+    if(lastAlbumHeight != this.album_height){
+      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+      this.dispatchEvent(albumHeightChangeEvent);
+    }
   }
 
   deleteSelectedItems(){
+    // since we remove the items of the array, the index of the array changes
+    // hence read them backwards :-)
+    // https://stackoverflow.com/a/9882349/8098748
+    
+    let i = this.data.length;
+    while(i--){
+      if(this.data[i].elem && this.data[i].elem.selected){
+        this.#deleteItem(this.data[i].elem, false);
+      }
+    };
 
+    setTimeout(()=>this.#performLayoutChangesIfNeeded(), 100)
   }
   
   #getMinAspectRatio(){
