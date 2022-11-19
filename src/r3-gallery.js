@@ -94,6 +94,11 @@ class R3Gallery extends HTMLElement {
         let c = document.createElement('r3-gallery-controls');
         this.shadowRoot.getElementById('gallery').append(c);
         c.ctr = this.#itemsSelected.length;
+        
+        // this is needed to enable transition
+        setTimeout(()=>{
+          c.style.top = '80%';
+        }, 10);
 
       } else {
         this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelected.length;
@@ -115,8 +120,14 @@ class R3Gallery extends HTMLElement {
 
     this.#itemsSelected = [];
 
-    this.shadowRoot.querySelector('r3-gallery-controls').ctr = 0;
-    this.shadowRoot.querySelector('r3-gallery-controls').remove();
+    let c = this.shadowRoot.querySelector('r3-gallery-controls');
+    c.ctr = 0;
+    c.style.top = '100%';
+    
+    // TODO: wait for CSS animation to complete
+    setTimeout(()=>{
+      c.remove();
+    }, 400);
   }
 
   #handleGalleryUpdatesRatingChanged = (evt)=>{
