@@ -42,32 +42,21 @@ class R3Gallery extends HTMLElement {
     this.#reAssignAlbumPositions();
     this.#selectivelyPaintAlbums();
 
-    this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-album-height-changed', this.#handleAlbumHeightChange, true)
-    ;
+    this.addEventListener('r3-album-height-changed', this.#handleAlbumHeightChange);
 
-    this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-item-selected', this.#handleItemSelected)
-    ;
+    this.addEventListener('r3-item-selected', this.#handleItemSelected);
 
-    this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-controls-closed', this.#handleGalleryUpdatesClosed)
-    ;
+    this.addEventListener('r3-gallery-controls-closed', this.#handleGalleryUpdatesClosed);
 
-    this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryUpdatesRatingChanged)
-    ;    
+    this.addEventListener('r3-gallery-controls-rating-changed', this.#handleGalleryUpdatesRatingChanged);
     
-    this.shadowRoot.getElementById('gallery')
-      .addEventListener('r3-gallery-events-delete-pressed', this.#handleGalleryUpdatesDeletePressed)
-    ;
+    this.addEventListener('r3-gallery-events-delete-pressed', this.#handleGalleryUpdatesDeletePressed);
 
     this.shadowRoot.getElementById('gallery')
       .addEventListener('scroll', this.#throttleHandleScroll)
     ;
     
-    window
-      .addEventListener('resize', this.#throttleHandleResize)
+    window.addEventListener('resize', this.#throttleHandleResize)
     ;
   }
 

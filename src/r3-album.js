@@ -105,7 +105,7 @@ class R3Album extends HTMLElement {
     // if there is any height change resulting from this delete, fire an event, so 
     // the wrapper r3-gallery can paint as needed
     if(lastAlbumHeight != this.album_height){
-      let albumHeightChangeEvent = new CustomEvent('r3-album-height-changed');
+      let albumHeightChangeEvent = new Event('r3-album-height-changed', {composed: true, bubbles: true});
       this.dispatchEvent(albumHeightChangeEvent);
     }
   }
