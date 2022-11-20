@@ -234,6 +234,14 @@
     </div>
   </template>
 
+  <template id="R3-ALBUM-NAME">
+    <style>
+
+    </style>
+    <div id="container">
+    </div>
+  </template>
+
 </head>
 
 
@@ -264,8 +272,9 @@
   (async ()=>{
 
     async function makePicsumAlbum(d){
-      let r = await fetch(`https://picsum.photos/v2/list?page=${d.page}&limit=${d.limit}`)
+      let r = await fetch(`https://picsum.photos/v2/list?page=${d.page}&limit=100`)
         .then(r=>r.json())
+        .then(r=>r.splice(1,d.limit))
       ;
       
       return r.map( x=>{
@@ -285,23 +294,36 @@
 
     // let picsumGallery = [{page: 5, limit:3}]
     let picsumGallery = [
-      {page: 2, limit: 62},
+      {page: 1, limit: 2},
+      {page: 2, limit: 20},
       {page: 3, limit: 55},
       {page: 4, limit: 78},
-      {page: 5, limit: 6},
+      {page: 5, limit: 16},
       {page: 6, limit: 19},
       {page: 7, limit: 54},
       {page: 8, limit: 15},
       {page: 9, limit: 32},
-      {page: 10, limit: 9},
-      {page: 11, limit: 19}
+      {page: 10, limit: 29}
     ];
+
+    let folderSuffixes = [
+      'My awesome trip',
+      'Objects of Desire',
+      'Mother earth',
+      'Trip to somewhere',
+      'A heavenly place',
+      'Touring the world',
+      'Nature',
+      'Bountiful views',
+      'Beautiful Landscapes',
+      'Cool places to see'
+    ]
 
     let dataPromises = picsumGallery.map(async function(gItem){
       let albumData = await makePicsumAlbum(gItem);
       return {
         id: gItem.page,
-        album: `Album for page ${gItem.page} contains ${albumData.length} items`,
+        album: `2022/2022-01-${String(gItem.page).padStart(2,'0')} ${folderSuffixes[gItem.page%folderSuffixes.length]}`,
         items: albumData
       }
     });
