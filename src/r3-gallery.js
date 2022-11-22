@@ -275,6 +275,8 @@ class R3Gallery extends HTMLElement {
     window
       .removeEventListener('resize', this.#throttleHandleResize)
     ;
+
+    // TODO other listeners
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
