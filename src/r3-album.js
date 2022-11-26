@@ -255,7 +255,7 @@ class R3Album extends HTMLElement {
   }
 
   #paintName(){
-    this.shadowRoot.getElementById('album-name').innerHTML = `<div>${this.album_name}</div>`;
+    this.shadowRoot.getElementById('album-name').innerHTML = `${this.album_name}`;
     this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
   }
 
