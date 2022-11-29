@@ -2,7 +2,7 @@
 
 
 
-// <r3-album name='Album 1' width=1000 gutterspace=4 data="[{photoid: 1, ar:1}, {photoid:2, ar: 1.33}, {photoid:5, ar:0.82}]"></r3-album>
+// <r3-album name='Album 1' width=1000 gutterspace=4 data="[{id: 1, ar:1}, {id:2, ar: 1.33}, {id:5, ar:0.82}]"></r3-album>
 
 // data or data_src are okay
 

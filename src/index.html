@@ -253,16 +253,16 @@
       <p>Here's the navbar</p>
     </div>
     <div id="main-content">
-      <!-- <r3-album album_name='Album 1' width=500 paint_layout data='[{"photoid": 106, "ar":1, "rating": 1}, {"photoid":204, "ar": 1.33, "rating": 1}, {"photoid":502, "ar":0.82, "rating": 1}]'></r3-album> -->
+      <!-- <r3-album album_name='Album 1' width=500 paint_layout data='[{"id": 106, "ar":1, "rating": 1}, {"id":204, "ar": 1.33, "rating": 1}, {"id":502, "ar":0.82, "rating": 1}]'></r3-album> -->
     </div>
   </div>
 
 <!-- <div class="gallery" style="margin: 0px;">
-  <r3-thumb class="thumb" photoid=220 rating="0" width="320" height="200" style="transform:translate(0px,0px)"></r3-thumb>
-  <r3-thumb class="thumb" photoid=320 rating="4" width="320" height="200" style="transform:translate(330px,0px)" selected></r3-thumb>
-  <r3-thumb class="thumb" photoid=422 rating="3" width="144" height="200" style="transform:translate(660px,0px)"></r3-thumb>
-  <r3-thumb class="thumb" photoid=820 rating="4" width="320" height="200" style="transform:translate(0px,210px)"></r3-thumb>
-  <r3-thumb class="thumb" photoid=902 rating="3" width="144" height="200" style="transform:translate(330px,210px)"></r3-thumb>
+  <r3-thumb class="thumb" id=220 rating="0" width="320" height="200" style="transform:translate(0px,0px)"></r3-thumb>
+  <r3-thumb class="thumb" id=320 rating="4" width="320" height="200" style="transform:translate(330px,0px)" selected></r3-thumb>
+  <r3-thumb class="thumb" id=422 rating="3" width="144" height="200" style="transform:translate(660px,0px)"></r3-thumb>
+  <r3-thumb class="thumb" id=820 rating="4" width="320" height="200" style="transform:translate(0px,210px)"></r3-thumb>
+  <r3-thumb class="thumb" id=902 rating="3" width="144" height="200" style="transform:translate(330px,210px)"></r3-thumb>
 </div>
  -->
 
@@ -281,7 +281,7 @@
       
       return r.map( x=>{
         return {
-          photoid: x.id, 
+          id: x.id, 
           ar: x.width/x.height, 
           rating: x.id%5
         }

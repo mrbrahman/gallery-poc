@@ -80,7 +80,7 @@ class R3Album extends HTMLElement {
       item.remove();
   
       // remove element from the list
-      let removedElementIndex = this.data.findIndex((x)=>x.elem.id==item.photoid)
+      let removedElementIndex = this.data.findIndex((x)=>x.layout.id==item.id)
       this.data.splice(removedElementIndex, 1);
       
       if(doLayoutChanges){
@@ -167,7 +167,7 @@ class R3Album extends HTMLElement {
           trX += this.gutterspace;
           
           let o = {
-            id: r.data.photoid,
+            id: r.data.id,
             width: r.data.ar * rowHeight,
             height: rowHeight,
             offsetHeight: trY, // will be useful when painting
@@ -230,8 +230,7 @@ class R3Album extends HTMLElement {
     if(x.elem == undefined){
       // create element in dom
       let elem = Object.assign(document.createElement('r3-thumb'), {
-        id: x.data.photoid,
-        photoid: x.data.photoid,
+        id: x.data.id,
         width: x.layout.width,
         height: x.layout.height,
         rating: x.data.rating

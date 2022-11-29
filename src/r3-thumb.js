@@ -1,11 +1,11 @@
 class R3Thumb extends HTMLElement {
   // instance variables
-  #photoid; #width; #height; #rating=0; #selected=false;
+  #width; #height; #rating=0; #selected=false;
   
   #dppx = parseFloat(window.devicePixelRatio.toFixed(2));
   
   static get observedAttributes() {
-    return ['photoid','rating','width','height','selected'];
+    return ['rating','width','height','selected'];
   }
   
   constructor() {
@@ -18,7 +18,7 @@ class R3Thumb extends HTMLElement {
     
     // console.log('in connected callback');
     // TODO: handle this properly. rating can have 0 value
-    // if(!(this.#photoid && this.#rating && this.#width && this.#height) ){
+    // if(!(this.#rating && this.#width && this.#height) ){
     //   return;
     // }
     
@@ -43,9 +43,6 @@ class R3Thumb extends HTMLElement {
 
     // use the "setters" to set the new values, so that any logic can be done in one place
     switch(name){
-      case 'photoid':
-        this.photoid = newValue;
-        break;
       case 'width':
         this.width = newValue;
         break;
@@ -124,9 +121,9 @@ class R3Thumb extends HTMLElement {
   #itemDeleted = (evt)=>{
     // TODO: delete item from system (make REST call)
     // console.log('dispatching delete event');
-    console.log('Delete from server/db here for photoid '+this.photoid);
+    console.log('Delete from server/db here for id '+this.id);
 
-    const deleteEvent = new CustomEvent('r3-item-deleted', {detail: {photoid: this.photoid} });
+    const deleteEvent = new CustomEvent('r3-item-deleted');
     this.dispatchEvent(deleteEvent);
   }
 
@@ -160,7 +157,7 @@ class R3Thumb extends HTMLElement {
         this.classList.add('ready');
       };
       // console.log(`need ${this.height * this.#dppx} px`)
-      img.src = `https://picsum.photos/id/${this.photoid}/${Math.round(this.width)}/${Math.round(this.height)}`;
+      img.src = `https://picsum.photos/id/${this.id}/${Math.round(this.width)}/${Math.round(this.height)}`;
     } 
   }
   #paintRating(){
@@ -203,14 +200,6 @@ class R3Thumb extends HTMLElement {
   }
   
   // boilerplate stuff
-  get photoid(){
-    return this.#photoid;
-  }
-  set photoid(_){
-    this.#photoid = _;
-    // nothing to paint
-  }
-  
   get width(){
     return this.#width;
   }
