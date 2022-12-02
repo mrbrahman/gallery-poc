@@ -107,9 +107,6 @@ class R3Thumb extends HTMLElement {
 
   #handleSelection = (evt)=>{
     this.selected = evt.target.checked; // calls the setter
-
-    let checkEvent = new CustomEvent('r3-item-selected', {composed: true, bubbles: true});
-    this.dispatchEvent(checkEvent);
   }
 
   #slRatingChanged = (evt)=>{
@@ -229,9 +226,10 @@ class R3Thumb extends HTMLElement {
   }
   set selected(_){
     this.#selected = _;
-
-    
     this.#paintSelected();
+
+    let checkEvent = new CustomEvent('r3-item-selected', {composed: true, bubbles: true});
+    this.dispatchEvent(checkEvent);
   }
 
 }
