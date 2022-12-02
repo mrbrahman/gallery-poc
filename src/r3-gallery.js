@@ -97,26 +97,24 @@ class R3Gallery extends HTMLElement {
       // even though we won't need to reset the #itemsSelected array etc, just call the function so 
       // the logic is in one place
 
-      this.#handleGalleryControlsClosed();
+      let c = this.shadowRoot.querySelector('r3-gallery-controls');
+      c.ctr = 0;
+      c.style.top = '100%';
+      
+      // TODO: wait for CSS animation to complete
+      setTimeout(()=>{
+        c.remove();
+      }, 400);
+
     }
 
   }
 
   #handleGalleryControlsClosed = ()=>{
-    this.#itemsSelected.forEach(x=>{
-      x.selected = false;
-    });
-
-    this.#itemsSelected = [];
-
-    let c = this.shadowRoot.querySelector('r3-gallery-controls');
-    c.ctr = 0;
-    c.style.top = '100%';
-    
-    // TODO: wait for CSS animation to complete
-    setTimeout(()=>{
-      c.remove();
-    }, 400);
+    let i = this.#itemsSelected.length;
+    while(i--){
+      this.#itemsSelected[i].selected = false;
+    }
   }
 
   #handleGalleryControlsRatingChanged = (evt)=>{
