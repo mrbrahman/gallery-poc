@@ -122,23 +122,11 @@
         position: relative;
       }
 
-      #album-name {
+      r3-album-name {
         margin: 0 0 0 4px;
         /* make it stick to the top as long as album is visible */
         position: sticky;
         top: 0px;
-        /* it's a flexbox so we can properly align items */
-        display: flex;
-        align-items: center;
-
-        font-size: 1.15rem;
-        font-weight: bolder;
-        /* height: 50px; this is set in javascript */
-        width: 100%;
-        overflow-y: scroll;
-        background-color: white;
-        /* make this go on top of r3-thumb */
-        z-index: 1;
       }
       
       r3-thumb {
@@ -151,6 +139,98 @@
     </style>
     <div id="container">
       <div id="album-name"></div>
+    </div>
+  </template>
+
+  <template id="R3-ALBUM-NAME">
+    <style>
+      :host {
+        /* height: 50px; */
+        display: grid;
+        grid-template-rows: 1fr;
+        grid-template-columns: auto 1fr auto;
+        /* grid-column-gap: 1px; */
+        align-items: center;
+        background-color: white;
+        z-index: 1;
+        /* "auto" does not transition yet 
+          see 
+          https://codepen.io/matuzo/post/animating-css-grid-layout-properties
+          https://nemzes.net/posts/animating-height-auto/
+          https://css-tricks.com/using-css-transitions-auto-dimensions/ and 
+          https://n12v.com/css-transition-to-from-auto/
+        
+          however, for whatever reason, the max-width / grid-workaround also did not work here as expected 
+          need to debug some other day. Until then there is no transition/animation :-/  
+        */
+        transition: all 0.3s;
+      }
+      
+      #album-name {
+        font-size: 1.1rem;
+        margin: auto;
+        padding: 0.5rem 0 0.5rem 0;
+        font-weight: bolder;
+        overflow-y: scroll;
+        margin: 0 5px 0 5px;
+        border-radius: 5px;
+      }
+
+      #album-name:hover {
+        cursor: text;
+        background: #fafafa;
+        outline: 2px solid #eee;
+      }
+
+      #album-name:focus {
+        background: #efefef;
+        outline: 2px solid green;
+        transition: all 0.3s; /* want transition to happen only during focus, and not hover */
+      }
+
+      sl-icon {
+        font-size: 1.5rem;
+      }
+
+      #select-all {
+        /* visibility: hidden; */ /* cannot transition, hence showing always*/
+        font-size: 2rem;
+      }
+
+      .select-all {
+        color: #66b3ff;
+      }
+      .select-some {
+        color: grey;
+      }
+      .select-none {
+        color: grey;
+      }
+
+      #edit-controls {
+        visibility: hidden;
+        cursor: pointer;
+      }
+
+      #save {
+        color: green;
+      }
+      #cancel {
+        color: darkred;
+        margin-right: 5px;
+      }
+
+    </style>
+
+    <sl-tooltip content="Toggle Select All" hoist>
+      <sl-icon id="select-all" class="select-none" name="check-circle"></sl-icon>
+    </sl-tooltip>
+
+    <div id="album-name" contenteditable role="textbox"></div>
+    
+    <div id="edit-controls">
+      <sl-icon id="save" name="check-circle-fill"></sl-icon>
+      <sl-icon id="cancel" name="x-circle-fill"></sl-icon>
     </div>
   </template>
 
@@ -233,14 +313,6 @@
         <!-- do I need the 3 dots for additional stuff? -->
         <!-- <sl-icon-button name="three-dots-vertical">More Options</sl-icon-button> -->
       </div>
-    </div>
-  </template>
-
-  <template id="R3-ALBUM-NAME">
-    <style>
-
-    </style>
-    <div id="container">
     </div>
   </template>
 

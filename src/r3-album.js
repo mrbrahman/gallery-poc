@@ -33,6 +33,10 @@ class R3Album extends HTMLElement {
     this.shadowRoot.getElementById('container')
       .addEventListener('r3-item-deleted', this.#handleItemDeleted, true)
     ;
+
+    this.shadowRoot.getElementById('container')
+      .addEventListener('r3-select-all-clicked', this.#handleSelectAll, true)
+    ;
   }
   
   attributeChangedCallback(name, oldValue, newValue) {
@@ -59,6 +63,11 @@ class R3Album extends HTMLElement {
     this.shadowRoot.getElementById('container')
     .removeEventListener('r3-item-deleted', this.#handleItemDeleted)
     ;
+  }
+
+  #handleSelectAll = (evt)=>{
+    // console.log('select all clicked');
+    this.data.forEach(item=>item.elem ? item.elem.selected = !item.elem.selected : null);
   }
 
   #handleItemDeleted = (evt)=>{
@@ -254,8 +263,11 @@ class R3Album extends HTMLElement {
   }
 
   #paintName(){
-    this.shadowRoot.getElementById('album-name').innerHTML = `${this.album_name}`;
-    this.shadowRoot.getElementById('album-name').style.height = this.album_name_height + 'px';
+    let a = document.createElement('r3-album-name');
+    a.albumName = this.album_name;
+    a.style.height = this.album_name_height + 'px';
+
+    this.shadowRoot.getElementById('container').appendChild(a);
   }
 
   // boilerplate
