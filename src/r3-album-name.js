@@ -17,7 +17,7 @@ class R3AlbumName extends HTMLElement {
     
     this.shadowRoot.getElementById("album-name").addEventListener('focus', this.#handleFocus);
     this.shadowRoot.getElementById("album-name").addEventListener('blur', this.#handleBlur);
-    this.shadowRoot.getElementById("album-name").addEventListener('keyup', this.#handleEscape);
+    this.shadowRoot.getElementById("album-name").addEventListener('keydown', this.#handleKey);
 
     this.shadowRoot.getElementById("save").addEventListener('click', this.#handleSave);
 
@@ -53,8 +53,10 @@ class R3AlbumName extends HTMLElement {
       console.log('TODO: save in db');
       this.albumName = this.shadowRoot.getElementById('album-name').innerText;
       // TODO: notify of successful change
-      this.shadowRoot.getElementById('edit-controls').style.visibility = 'hidden';
     }
+
+    this.shadowRoot.getElementById('album-name').blur();
+    this.shadowRoot.getElementById('edit-controls').style.visibility = 'hidden';
   }
 
   #handleCancel = (evt) => {
@@ -83,9 +85,11 @@ class R3AlbumName extends HTMLElement {
     // cannot notify here since blur is called even when save is pressed (before save is called)
   }
 
-  #handleEscape = (evt) => {
+  #handleKey = (evt) => {
     if (evt.key == "Escape"){
       this.#handleCancel();
+    } else if(evt.key == "Enter"){
+      this.#handleSave();
     }
   }
 
