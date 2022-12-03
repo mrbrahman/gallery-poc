@@ -1,6 +1,6 @@
 class R3AlbumName extends HTMLElement {
 
-  #albumName; #select='none';
+  #albumName; #albumSelectedValue='none';
 
   constructor() {
     super().attachShadow({mode: 'open'}); // sets "this" and "this.shadowRoot"
@@ -26,26 +26,12 @@ class R3AlbumName extends HTMLElement {
   }
 
   #handleSelectAll = (evt) => {
-    let classes = ['select-none','select-some','select-all'];
+    // toggle between 'all' and 'none'
+    this.#albumSelectedValue = this.#albumSelectedValue == 'all' ? 'none' : 'all';
+    this.#paintSelectAllCheckbox();
 
-    switch(this.#select){
-      // moving from none to all
-      case 'none':
-        evt.target.name = "check-circle-fill";
-        evt.target.classList.remove(...classes);
-        evt.target.classList.add('select-all');
-        this.#select = 'all';
-        break;
-      // moving from some/all to none
-      case 'some':
-      case 'all':
-        evt.target.name = "check-circle";
-        evt.target.classList.remove(...classes);
-        evt.target.classList.add('select-none');
-        this.#select = 'none';
-        break;
-    }
-    this.dispatchEvent(new CustomEvent('r3-select-all-clicked', {detail: {select: this.#select}}));
+    let selectAllEvent = new CustomEvent('r3-select-all-clicked', {detail: {select: this.#albumSelectedValue == 'all' ? true : false}})
+    this.dispatchEvent(selectAllEvent);
   }
 
   #handleSave = (evt) => {
@@ -109,13 +95,48 @@ class R3AlbumName extends HTMLElement {
     this.shadowRoot.getElementById('album-name').innerText = this.#albumName;
   }
 
+  #paintSelectAllCheckbox(){
+    let classes = ['select-none','select-some','select-all'];
+    let checkbox = this.shadowRoot.getElementById('select-all');
+
+    switch(this.#albumSelectedValue){
+      case 'none':
+        checkbox.name = "check-circle";
+        checkbox.classList.remove(...classes);
+        checkbox.classList.add('select-none');
+        break;
+      case 'some':
+        checkbox.name = "check-circle-fill";
+        checkbox.classList.remove(...classes);
+        checkbox.classList.add('select-some');
+        break;     
+      case 'all':
+        checkbox.name = "check-circle-fill";
+        checkbox.classList.remove(...classes);
+        checkbox.classList.add('select-all');
+        break;
+    }
+  }
+
   get albumName() {
     return this.#albumName;
   }
   set albumName(_) {
     this.#albumName = _;
+
     if(this.isConnected){
       this.#paintAlbumName();
+    }
+  }
+
+  get albumSelectedValue() {
+    return this.#albumSelectedValue;
+  }
+  set albumSelectedValue(_){
+    this.#albumSelectedValue = _;
+    
+    if(this.isConnected){
+      this.#paintSelectAllCheckbox();
     }
   }
 

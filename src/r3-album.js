@@ -37,6 +37,9 @@ class R3Album extends HTMLElement {
     this.shadowRoot.getElementById('container')
       .addEventListener('r3-select-all-clicked', this.#handleSelectAll, true)
     ;
+
+    this.shadowRoot.getElementById('container')
+      .addEventListener('r3-item-selected', this.#handleItemSelected, true);
   }
   
   attributeChangedCallback(name, oldValue, newValue) {
@@ -67,7 +70,41 @@ class R3Album extends HTMLElement {
 
   #handleSelectAll = (evt)=>{
     // console.log('select all clicked');
-    this.data.forEach(item=>item.elem ? item.elem.selected = !item.elem.selected : null);
+    let selected = evt.detail.select;
+    this.data.forEach(item=>{
+      if(item.elem){
+        if(item.elem.selected == selected){
+          // item is already in the target state, nothing to do
+        } else {
+          item.elem.selected = selected;
+        }
+      } else {
+        // the item is not in DOM yet, save the state in layout
+        item.layout.selected = selected;
+      }
+    });
+  }
+
+  #handleItemSelected = (evt)=>{
+    // none to select-some / select-all (or a single album item)
+    // select-some to select-all / none
+    // select-all to select-some / none (for a single album item)
+
+    // get distinct values of array found at https://stackoverflow.com/a/14438954/8098748
+    let albumItemsDistinctSelected = [... new Set( this.data.map(item=>item.elem ? item.elem.selected : item.layout.selected ? item.layout.selected : false) )];
+
+    let r3AlbumName = this.shadowRoot.querySelector('r3-album-name');
+    
+    if(albumItemsDistinctSelected.length > 1){
+      r3AlbumName.albumSelectedValue = 'some';
+    } else {
+      if (albumItemsDistinctSelected[0] == true){
+        r3AlbumName.albumSelectedValue = 'all';
+      } else {
+        r3AlbumName.albumSelectedValue = 'none';
+      }
+    }
+
   }
 
   #handleItemDeleted = (evt)=>{
