@@ -254,7 +254,7 @@ class R3Album extends HTMLElement {
         // album is within the boundaries
         this.#paintItem(x);
       } else {
-        // album is not within boundaries
+        // item is not within boundaries
 
         // remove the item from DOM if present
         if(x.elem !== undefined){
