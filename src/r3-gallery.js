@@ -44,6 +44,8 @@ class R3Gallery extends HTMLElement {
 
     this.addEventListener('r3-album-height-changed', this.#handleAlbumHeightChange);
 
+    this.addEventListener('r3-album-empty', this.#removeAlbum);
+
     this.addEventListener('r3-item-selected', this.#handleItemSelected);
 
     this.addEventListener('r3-gallery-controls-closed', this.#handleGalleryControlsClosed);
@@ -94,8 +96,6 @@ class R3Gallery extends HTMLElement {
       }
       
     } else if(this.#itemsSelected.length == 0){
-      // even though we won't need to reset the #itemsSelected array etc, just call the function so 
-      // the logic is in one place
 
       let c = this.shadowRoot.querySelector('r3-gallery-controls');
       c.ctr = 0;
@@ -151,6 +151,20 @@ class R3Gallery extends HTMLElement {
     this.#reAssignAlbumPositions();
     // bring more items to the buffer, or remove items from buffer as necessary
     this.#selectivelyPaintAlbums();
+  }
+
+  #removeAlbum = (evt) => {
+    let deletedAlbumId = evt.composedPath()[0].id;
+
+    let idx = this.#albums.findIndex(x=>x.id == deletedAlbumId);
+
+    // remove the album from DOM as well as reference in array
+    this.shadowRoot.getElementById(deletedAlbumId).remove();
+    this.#albums.splice(idx, 1);
+    delete(this.#albumsInBuffer[deletedAlbumId]);
+
+    this.#handleAlbumHeightChange();
+
   }
 
   #selectivelyPaintAlbums(forceRepaint = true) {

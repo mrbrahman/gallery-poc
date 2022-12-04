@@ -137,6 +137,16 @@ class R3Album extends HTMLElement {
   }
 
   #performLayoutChangesIfNeeded(){
+    // check if album is empty
+    if (this.data.length == 0){
+      let albumEmptyEvent = new Event('r3-album-empty', {composed: true, bubbles: true});
+      this.dispatchEvent(albumEmptyEvent);
+
+      return; // nothing else to do here
+    }
+
+    // album is not empty, see if height changes are needed
+
     let lastAlbumHeight = this.album_height;
     // re-calc layout
     this.#doLayout();
