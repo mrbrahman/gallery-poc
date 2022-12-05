@@ -107,6 +107,8 @@ class R3Thumb extends HTMLElement {
 
   #handleSelection = (evt)=>{
     this.selected = evt.target.checked; // calls the setter
+    let checkEvent = new CustomEvent('r3-item-selected', {composed: true, bubbles: true});
+    this.dispatchEvent(checkEvent);
   }
 
   #slRatingChanged = (evt)=>{
@@ -224,12 +226,12 @@ class R3Thumb extends HTMLElement {
   get selected(){
     return this.#selected;
   }
+  // Note: setting selected through Javascript will not trigger an event
+  // it is assumed that the parent that is setting it already knows it is set, and 
+  // doesn't need an event
   set selected(_){
     this.#selected = _;
     this.#paintSelected();
-
-    let checkEvent = new CustomEvent('r3-item-selected', {composed: true, bubbles: true});
-    this.dispatchEvent(checkEvent);
   }
 
 }

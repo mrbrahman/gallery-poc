@@ -11,7 +11,7 @@ import {debounce, throttle} from './utils.mjs';
 class R3Gallery extends HTMLElement {
 
   // internal variables
-  #albums = []; #albumsInBuffer = {}; #itemsSelected = [];
+  #albums = []; #albumsInBuffer = {}; #itemsSelectedCnt = 0;
   // variables that can be get/set
   #data;
 
@@ -46,7 +46,7 @@ class R3Gallery extends HTMLElement {
 
     this.addEventListener('r3-album-empty', this.#removeAlbum);
 
-    this.addEventListener('r3-item-selected', this.#handleItemSelected);
+    this.addEventListener('r3-album-item-selected', this.#handleItemsSelected);
 
     this.addEventListener('r3-gallery-controls-closed', this.#handleGalleryControlsClosed);
 
@@ -62,29 +62,15 @@ class R3Gallery extends HTMLElement {
     ;
   }
 
-  #handleItemSelected = (evt)=>{
-    // Even though the event is fired from r3-thumb, evt.target is set to r3-album
-    // That's because: for shadow components, browser thinks the parent knows only about the
-    // children it created, not any other components that the children might have created.
-    // See: https://javascript.info/shadow-dom-events for more details.
-    // In our case however, as developer I have full knowledge of all components :-) so we
-    // make use of the actual target
+  #handleItemsSelected = (evt)=>{
+    // console.log(evt.detail.cnt);
+    this.#itemsSelectedCnt += evt.detail.cnt;
 
-    // Use the first element of composedPath() to identify the event firing r3-thumb
-    let item = evt.composedPath()[0];
-
-    if(item.selected){
-      this.#itemsSelected.push(item);
-    } else {
-      let idx = this.#itemsSelected.findIndex((x)=>x.id==item.id)
-      this.#itemsSelected.splice(idx, 1);
-    }
-
-    if(this.#itemsSelected.length > 0){
+    if(this.#itemsSelectedCnt > 0){
       if(!this.shadowRoot.querySelector('r3-gallery-controls')){
         let c = document.createElement('r3-gallery-controls');
         this.shadowRoot.getElementById('gallery').append(c);
-        c.ctr = this.#itemsSelected.length;
+        c.ctr = this.#itemsSelectedCnt;
         
         // this is needed to enable transition
         setTimeout(()=>{
@@ -92,10 +78,10 @@ class R3Gallery extends HTMLElement {
         }, 10);
 
       } else {
-        this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelected.length;
+        this.shadowRoot.querySelector('r3-gallery-controls').ctr = this.#itemsSelectedCnt;
       }
       
-    } else if(this.#itemsSelected.length == 0){
+    } else if(this.#itemsSelectedCnt == 0){
 
       let c = this.shadowRoot.querySelector('r3-gallery-controls');
       c.ctr = 0;
@@ -105,34 +91,32 @@ class R3Gallery extends HTMLElement {
       setTimeout(()=>{
         c.remove();
       }, 400);
-
     }
 
+    console.log(this.#itemsSelectedCnt);
+
+    
   }
 
   #handleGalleryControlsClosed = ()=>{
-    let i = this.#itemsSelected.length;
-    while(i--){
-      this.#itemsSelected[i].selected = false;
-    }
+    this.#albums.forEach(album=>{
+      album.unselectSelectedItems();
+    });
+    console.log(this.#itemsSelectedCnt);
+
   }
 
   #handleGalleryControlsRatingChanged = (evt)=>{
-    console.log('mass update in DB and files exif');
-
-    this.#itemsSelected.forEach(x=>{
-      x.rating = evt.detail.newRating;
+    this.#albums.forEach(album=>{
+      album.changeRatingSelectedItems(evt.detail.newRating);
     });
-
   }
 
   #handleGalleryControlsDeletePressed = (evt)=>{
     console.log('in delete pressed');
     this.#albums.forEach(album=>album.deleteSelectedItems());
 
-    // since the selected items are deleted, there is no need to keep the controls open
-    // as there are no more items selected
-    this.#handleGalleryControlsClosed();
+    console.log(this.#itemsSelectedCnt);
   }
 
   #reAssignAlbumPositions(){

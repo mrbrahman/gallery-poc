@@ -69,7 +69,9 @@ class R3Album extends HTMLElement {
   }
 
   #handleSelectAll = (evt)=>{
-    // console.log('select all clicked');
+    let cntChanged = 0;
+
+    // # First select all items in the album
     let selected = evt.detail.select;
     this.data.forEach(item=>{
       if(item.elem){
@@ -77,19 +79,28 @@ class R3Album extends HTMLElement {
           // item is already in the target state, nothing to do
         } else {
           item.elem.selected = selected;
+          cntChanged++;
         }
       } else {
         // the item is not in DOM yet, save the state in layout
+        // no need to check like above, since if the item in not in DOM, it could
+        // not have been manually selected/unselected before
         item.layout.selected = selected;
+        cntChanged++;
       }
     });
+
+    this.dispatchEvent( new CustomEvent('r3-album-item-selected', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        cnt: cntChanged * (selected ? 1 : -1)
+      }
+    }) );
+
   }
 
-  #handleItemSelected = (evt)=>{
-    // none to select-some / select-all (or a single album item)
-    // select-some to select-all / none
-    // select-all to select-some / none (for a single album item)
-
+  #updateAlbumSelect(){
     // get distinct values of array found at https://stackoverflow.com/a/14438954/8098748
     let albumItemsDistinctSelected = [... new Set( this.data.map(item=>item.elem ? item.elem.selected : item.layout.selected ? item.layout.selected : false) )];
 
@@ -104,36 +115,51 @@ class R3Album extends HTMLElement {
         r3AlbumName.albumSelectedValue = 'none';
       }
     }
+  }
 
+  #handleItemSelected = (evt)=>{
+    // #1 First find out and set the value of album select
+    this.#updateAlbumSelect();
+
+    // #2 create an event and pass it to gallery, which will be used in r3-gallery-controls
+    this.dispatchEvent( new CustomEvent('r3-album-item-selected', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        cnt: evt.target.selected ? 1 : -1
+      }
+    }) );
   }
 
   #handleItemDeleted = (evt)=>{
-    let deletedItem = evt.target;
-    this.#deleteItem(deletedItem, true);
+    let deletedElem = evt.target,
+      deletedItemIdx = this.data.findIndex((x)=>x.layout.id == deletedElem.id);
     
+    this.#deleteItem(deletedItemIdx, true);
+
+    this.#updateAlbumSelect();
   }
   
-  #deleteItem(item, doLayoutChanges=false){
+  #deleteItem(itemIdx, doLayoutChanges=false){
     // if an item from this album is deleted, 
     // 1. remove references to the item,
     // 2. recompute album layout, 
     // 3. and if height has changed, dispatch an event
+    let item = this.data[itemIdx];
+
+    if(item.elem && item.elem.isConnected){
+      item.elem.style.transform += " scale(0)";
+      setTimeout(() => {
+        item.elem.remove();
+      }, 100);
+    }
+
+    // remove element from the list
+    this.data.splice(itemIdx, 1);
     
-    item.style.transform += " scale(0)";
-    // TODO: add listener to wait for CSS animation completion, rather than hardcode ms
-    setTimeout(()=>{
-      // remove the item from DOM (with a transition)
-      item.remove();
-  
-      // remove element from the list
-      let removedElementIndex = this.data.findIndex((x)=>x.layout.id==item.id)
-      this.data.splice(removedElementIndex, 1);
-      
-      if(doLayoutChanges){
-        this.#performLayoutChangesIfNeeded();
-      }
-    }, 100);
-    
+    if(doLayoutChanges){
+      this.#performLayoutChangesIfNeeded();
+    }
   }
 
   #performLayoutChangesIfNeeded(){
@@ -166,20 +192,74 @@ class R3Album extends HTMLElement {
     }
   }
 
+  unselectSelectedItems(){
+    let unselectedCnt = 0;
+
+    this.data.forEach(item=>{
+      if(item.elem && item.elem.selected){
+        item.elem.selected = false;
+        unselectedCnt++;
+      } else if (item.layout.selected){
+        item.layout.selected = false;
+        unselectedCnt++;
+      }
+    });
+
+    // save a few CPU cycles by directly setting to 'none',
+    // rather than calling #updateAlbumSelect
+    this.shadowRoot.querySelector('r3-album-name').albumSelectedValue = 'none';
+
+    // since the selected items are unselected, send an unselected message to gallery
+    this.dispatchEvent( new CustomEvent('r3-album-item-selected', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        cnt: -unselectedCnt
+      }
+    }) );
+  }
+
+  changeRatingSelectedItems(newRating) {
+    this.data.forEach(item=>{
+      if(item.elem && item.elem.selected){
+        item.elem.rating = newRating;
+      } else if (item.layout.selected){
+        item.data.rating = newRating;
+      }
+    })    
+  }
+
   deleteSelectedItems(){
-    // since we remove the items of the array, the index of the array changes
-    // hence read them backwards :-)
+    // since we remove the items of the array as we're reading the array, 
+    // the index of the array changes
+    // hence read the array backwards :-)
     // https://stackoverflow.com/a/9882349/8098748
-    
+    let deletedCnt = 0;
+
     let i = this.data.length;
     while(i--){
-      if(this.data[i].elem && this.data[i].elem.selected){
-        this.#deleteItem(this.data[i].elem, false);
+      if((this.data[i].elem && this.data[i].elem.selected) || this.data[i].layout.selected){
+        this.#deleteItem(i, false);
+        deletedCnt++;
       }
     };
 
-    setTimeout(()=>this.#performLayoutChangesIfNeeded(), 100)
+    if(deletedCnt > 0){
+      // since the selected items are deleted, send an unselected message to gallery
+      this.dispatchEvent( new CustomEvent('r3-album-item-selected', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          cnt: -deletedCnt
+        }
+      }) );
+
+      this.#updateAlbumSelect();
+    }
+
+    setTimeout(()=>this.#performLayoutChangesIfNeeded(), 100);
   }
+
   
   #getMinAspectRatio(){
     if (this.width <= 640) {
@@ -289,7 +369,8 @@ class R3Album extends HTMLElement {
         id: x.data.id,
         width: x.layout.width,
         height: x.layout.height,
-        rating: x.data.rating
+        rating: x.data.rating,
+        selected: x.layout.selected ? x.layout.selected : false
       });
       elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
       
