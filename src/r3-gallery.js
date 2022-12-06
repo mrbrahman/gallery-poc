@@ -134,7 +134,11 @@ class R3Gallery extends HTMLElement {
     // apply "style: top" changes to all albums
     this.#reAssignAlbumPositions();
     // bring more items to the buffer, or remove items from buffer as necessary
-    this.#selectivelyPaintAlbums();
+    // need to wait for the album height animation to complete
+    // so 'offsetTop' value is properly obtained
+    setTimeout(() => {
+      this.#selectivelyPaintAlbums();
+    }, 400);
   }
 
   #removeAlbum = (evt) => {
@@ -193,7 +197,7 @@ class R3Gallery extends HTMLElement {
       let albumBottomInBuffer = () => (albumBottom >= bufferTop && albumBottom <= bufferBottom);
       let albumTopInBuffer    = () => (albumTop    >= bufferTop && albumTop    <= bufferBottom);
       let albumEncompassesBuffer = () => (albumTop <= bufferTop && albumBottom >= bufferBottom);
-      
+
       // in case the full album was already loaded in the buffer, and the entire album continues to exist,
       // take a shortcut and no need to adjust anything, unless explicitly set during the function call.
       
@@ -205,7 +209,7 @@ class R3Gallery extends HTMLElement {
         albumBottomInBuffer() && albumTopInBuffer()
       ) {
         // don't need to do anything
-        console.log(`not doing ${album.id}`)
+        console.log(`not doing ${album.id}`);
         return;
       }
 
