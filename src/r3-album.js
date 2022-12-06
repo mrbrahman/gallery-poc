@@ -331,7 +331,6 @@ class R3Album extends HTMLElement {
   redoLayout = this.#doLayout;
   
   selectivelyPaintLayout(bufferTop, bufferBottom, albumTop){
-    // console.log('in selectivelyPaintLayout')
 
     this.data.forEach(x=>{
 
@@ -382,11 +381,12 @@ class R3Album extends HTMLElement {
     } else if (!x.elem.isConnected){
       // the thumb was removed, but element (class) was found - just append the element back into the DOM
       this.shadowRoot.getElementById('container').appendChild(x.elem);
+
     } else {
       // just update the new position (for resize / delete events)
       x.elem.width = x.layout.width;
       x.elem.height = x.layout.height;
-      x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`
+      x.elem.style.transform = `translate(${x.layout.trX},${x.layout.trY})`;
     }
   }
 
