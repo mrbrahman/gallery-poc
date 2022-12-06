@@ -85,7 +85,7 @@ class R3Gallery extends HTMLElement {
 
       let c = this.shadowRoot.querySelector('r3-gallery-controls');
       c.ctr = 0;
-      c.style.top = '100%';
+      c.style.top = '0%';
       
       // TODO: wait for CSS animation to complete
       setTimeout(()=>{
