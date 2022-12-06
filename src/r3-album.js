@@ -7,12 +7,10 @@ class R3Album extends HTMLElement {
   }
   
   constructor() {
-    // console.log('in constructor')
     super().attachShadow({mode: 'open'}); // sets "this" and "this.shadowRoot"
   }
   
   connectedCallback() {
-    // console.log('in connectedCallback')
     this.shadowRoot.appendChild(
       document.getElementById(this.nodeName).content.cloneNode(true)
     );
@@ -273,9 +271,6 @@ class R3Album extends HTMLElement {
   }
   
   #doLayout(){
-    // console.log('in #doLayout');
-    // console.log('width: '+this.clientWidth)
-    // console.log('width: '+this.#width)
     let minAspectRatio = this.#getMinAspectRatio(), row = [], rowAspectRatio = 0, 
       trX = 0, trY = this.album_name_height;
 

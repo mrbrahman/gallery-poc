@@ -9,14 +9,11 @@ class R3Thumb extends HTMLElement {
   }
   
   constructor() {
-    // console.log('in constructor')
     super().attachShadow({mode: 'open'}); // sets "this" and "this.shadowRoot"
-    // console.log(this.#dppx)
   }
 
   connectedCallback() {
     
-    // console.log('in connected callback');
     // TODO: handle this properly. rating can have 0 value
     // if(!(this.#rating && this.#width && this.#height) ){
     //   return;
@@ -30,7 +27,6 @@ class R3Thumb extends HTMLElement {
     // create a placeholder regardless of whether the element is still in DOM
     this.#paintWidth();
     this.#paintHeight();
-    // console.log(this.parentNode.offsetWidth);
     
     // wait for an arbitrary 250ms and create & paint the rest of the shadow DOM
     // this is so that in case the user is scrolling too fast, we don't download the image unnessarily or call the other sl (shoelace) web components or setup the listeners
@@ -39,7 +35,6 @@ class R3Thumb extends HTMLElement {
   }
   
   attributeChangedCallback(name, oldValue, newValue) {
-    // console.log(`setting ${name} from *${oldValue}* to *${newValue}*`)
 
     // use the "setters" to set the new values, so that any logic can be done in one place
     switch(name){
@@ -63,7 +58,6 @@ class R3Thumb extends HTMLElement {
     // TODO: also check if we need to remove these listeners explicitly, since we're removing the 
     // shadow DOM anyway, and the listeners should get automatically removed by browser
     
-    // console.log('in dicsonnectedCallback');
     this.shadowRoot.querySelector('input[type="checkbox"]').removeEventListener('click', this.#handleSelection);
     this.shadowRoot.querySelector('sl-rating').removeEventListener('sl-change', this.#slRatingChanged);
     this.shadowRoot.querySelector('sl-icon-button[name="trash"]').removeEventListener('click', this.#itemDeleted);
@@ -113,14 +107,12 @@ class R3Thumb extends HTMLElement {
 
   #slRatingChanged = (evt)=>{
     let r = evt.target.value;
-    console.log(`new value: ${r} to be updated in db`);
+    console.log(`TODO: new value: ${r} to be updated in db`);
     this.#rating = r;
   }
   
   #itemDeleted = (evt)=>{
-    // TODO: delete item from system (make REST call)
-    // console.log('dispatching delete event');
-    console.log('Delete from server/db here for id '+this.id);
+    console.log('TODO Delete from server/db here for id '+this.id);
 
     const deleteEvent = new CustomEvent('r3-item-deleted');
     this.dispatchEvent(deleteEvent);

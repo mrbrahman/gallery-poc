@@ -16,7 +16,6 @@ class R3Gallery extends HTMLElement {
   #data;
 
   constructor() {
-    // console.log('in constructor')
     super().attachShadow({mode: 'open'}); // sets "this" and "this.shadowRoot"
   }
 
@@ -63,7 +62,6 @@ class R3Gallery extends HTMLElement {
   }
 
   #handleItemsSelected = (evt)=>{
-    // console.log(evt.detail.cnt);
     this.#itemsSelectedCnt += evt.detail.cnt;
 
     if(this.#itemsSelectedCnt > 0){
@@ -93,17 +91,12 @@ class R3Gallery extends HTMLElement {
       }, 400);
     }
 
-    console.log(this.#itemsSelectedCnt);
-
-    
   }
 
   #handleGalleryControlsClosed = ()=>{
     this.#albums.forEach(album=>{
       album.unselectSelectedItems();
     });
-    console.log(this.#itemsSelectedCnt);
-
   }
 
   #handleGalleryControlsRatingChanged = (evt)=>{
@@ -113,10 +106,7 @@ class R3Gallery extends HTMLElement {
   }
 
   #handleGalleryControlsDeletePressed = (evt)=>{
-    console.log('in delete pressed');
     this.#albums.forEach(album=>album.deleteSelectedItems());
-
-    console.log(this.#itemsSelectedCnt);
   }
 
   #reAssignAlbumPositions(){
@@ -130,12 +120,12 @@ class R3Gallery extends HTMLElement {
   }
   
   #handleAlbumHeightChange = () => {
-    // console.log('in handleAlbumHeightChange')
     // apply "style: top" changes to all albums
     this.#reAssignAlbumPositions();
+    
     // bring more items to the buffer, or remove items from buffer as necessary
-    // need to wait for the album height animation to complete
-    // so 'offsetTop' value is properly obtained
+    // need to wait for the album height animation to complete, before doinf this
+    // so that 'offsetTop' value is properly obtained
     setTimeout(() => {
       this.#selectivelyPaintAlbums();
     }, 400);
@@ -175,10 +165,9 @@ class R3Gallery extends HTMLElement {
     //
     //   --------------------------------------- bufferBottom
     
-    // for easy comparisons, we convert scroll to a -ve number
+    // to be able to do math, we convert scroll to a -ve number
     
     let scrollTop = -this.shadowRoot.getElementById('gallery').scrollTop;
-    // console.log(`scrollTop ${scrollTop}`)
     
     // we make the buffers on each side 6 times the size of the screen
 
@@ -188,11 +177,8 @@ class R3Gallery extends HTMLElement {
       bufferTop = viewportHeight * -6, 
       bufferBottom = viewportHeight * (1+6);
     
-    // console.log(`bufferTop ${bufferTop} bufferBottom ${bufferBottom}`)
-    
     this.#albums.forEach(album=>{
       let albumTop = album.offsetTop + scrollTop, albumBottom = albumTop + album.album_height;
-      // console.log(`id: ${album.id} albumTop ${albumTop} albumBottom ${albumBottom}`)
 
       let albumBottomInBuffer = () => (albumBottom >= bufferTop && albumBottom <= bufferBottom);
       let albumTopInBuffer    = () => (albumTop    >= bufferTop && albumTop    <= bufferBottom);
@@ -209,7 +195,7 @@ class R3Gallery extends HTMLElement {
         albumBottomInBuffer() && albumTopInBuffer()
       ) {
         // don't need to do anything
-        console.log(`not doing ${album.id}`);
+        // console.log(`not doing ${album.id}`);
         return;
       }
 
