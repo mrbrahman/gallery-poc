@@ -122,13 +122,18 @@ class R3Gallery extends HTMLElement {
   #handleAlbumHeightChange = () => {
     // apply "style: top" changes to all albums
     this.#reAssignAlbumPositions();
+
+    // paint albums twice for better user experience
+    // painting only once after timeout causes an unnecessary delay 
+    // in resizing last row when items are deleted at the bottom of the album
+    this.#selectivelyPaintAlbums();
     
     // bring more items to the buffer, or remove items from buffer as necessary
     // need to wait for the album height animation to complete, before doinf this
     // so that 'offsetTop' value is properly obtained
     setTimeout(() => {
       this.#selectivelyPaintAlbums();
-    }, 400);
+    }, 300);
   }
 
   #removeAlbum = (evt) => {
