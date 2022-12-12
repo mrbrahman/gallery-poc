@@ -1,10 +1,9 @@
-// some concepts adapted from: https://dev.to/dannyengelman/web-component-102-the-5-lessons-after-learning-web-components-101-h9p
+// many web component practices adapted from: https://dev.to/dannyengelman/web-component-102-the-5-lessons-after-learning-web-components-101-h9p
 
+// some functional (logic) concepts adapted from https://github.com/schlosser/pig.js/ and further expanded for multiple albums
 
-
-// <r3-album name='Album 1' width=1000 gutterspace=4 data="[{id: 1, ar:1}, {id:2, ar: 1.33}, {id:5, ar:0.82}]"></r3-album>
-
-// data or data_src are okay
+// e.g. TBD
+// <r3-gallery ></r3-gallery>
 
 import {debounce, throttle} from './utils.mjs';
 
@@ -129,7 +128,7 @@ class R3Gallery extends HTMLElement {
     this.#selectivelyPaintAlbums();
     
     // bring more items to the buffer, or remove items from buffer as necessary
-    // need to wait for the album height animation to complete, before doinf this
+    // need to wait for the album height animation to complete, before doing this
     // so that 'offsetTop' value is properly obtained
     setTimeout(() => {
       this.#selectivelyPaintAlbums();
@@ -290,7 +289,7 @@ class R3Gallery extends HTMLElement {
   }
   set data_src(_){
     this._data_src = _;
-    // do a fetch and set this.#data
+    // TODO: do a fetch and set this.#data
   }
 
 }
