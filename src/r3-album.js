@@ -1,3 +1,6 @@
+
+// <r3-album album_name='Album 1' width=1000 gutterspace=4 paintlayout width=500 data="[{id: 1, ar:1}, {id:2, ar: 1.33}, {id:5, ar:0.82}]"></r3-album>
+
 class R3Album extends HTMLElement {
   
   #width; #paint_layout = false; #gutterspace = 4; #data; #album_name; #album_name_height = 50; #album_height; 
